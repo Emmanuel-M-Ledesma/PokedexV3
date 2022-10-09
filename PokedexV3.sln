@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32922.545
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokedexV3.Android", "PokedexV3\PokedexV3.Android\PokedexV3.Android.csproj", "{782A2247-70DC-4A28-8550-28C6B896BD7C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PokedexV3", "PokedexV3\PokedexV3\PokedexV3.csproj", "{0188D074-6D09-4051-988A-62BC2C89A02F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{782A2247-70DC-4A28-8550-28C6B896BD7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{782A2247-70DC-4A28-8550-28C6B896BD7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{782A2247-70DC-4A28-8550-28C6B896BD7C}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{782A2247-70DC-4A28-8550-28C6B896BD7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{782A2247-70DC-4A28-8550-28C6B896BD7C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{782A2247-70DC-4A28-8550-28C6B896BD7C}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{0188D074-6D09-4051-988A-62BC2C89A02F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0188D074-6D09-4051-988A-62BC2C89A02F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0188D074-6D09-4051-988A-62BC2C89A02F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{0188D074-6D09-4051-988A-62BC2C89A02F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0188D074-6D09-4051-988A-62BC2C89A02F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0188D074-6D09-4051-988A-62BC2C89A02F}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BA063CAA-038F-424E-90BC-4FFDA6DF4AC8}
+	EndGlobalSection
+EndGlobal
