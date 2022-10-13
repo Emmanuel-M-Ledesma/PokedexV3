@@ -2,7 +2,24 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PokedexV3.ListaPokemon"
-             Title="Lista Pokémon">
+             Title="Lista de Pokémon"
+             NavigationPage.HasNavigationBar="True">
+
+    <NavigationPage.TitleView>
+        <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
+            <Label
+                HorizontalOptions="CenterAndExpand"  
+                HorizontalTextAlignment="Start"
+                VerticalTextAlignment="Center"
+                Text="Lista de Pokemon"
+                TextColor="White"
+                VerticalOptions="Center" />
+            <SearchBar  HorizontalOptions="EndAndExpand"  
+                        Margin="0,2,10,2"/>
+
+        </StackLayout>
+    </NavigationPage.TitleView>
+
     <ContentPage.Content>
         <StackLayout>
             <ListView x:Name="ListPoke" Background="white" BackgroundColor="White" SeparatorColor="Gray" SelectionMode="Single" VerticalOptions="End" RowHeight="100" ItemTapped="ListPoke_ItemTapped">
@@ -18,22 +35,12 @@
                                             <RowDefinition Height="*"/>
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="150"/>                                            
+                                            <ColumnDefinition Width="150"/>
                                             <ColumnDefinition Width="100"/>
                                             <ColumnDefinition Width="120"/>
                                             <ColumnDefinition Width="120"/>
                                         </Grid.ColumnDefinitions>
-                                        <Frame Grid.Row="0"
-                                               Grid.Column="0"
-                                               Grid.RowSpan="3"
-                                               Grid.ColumnSpan="4"
-                                               HorizontalOptions="FillAndExpand"
-                                               VerticalOptions="FillAndExpand"
-                                               BackgroundColor="{Binding frColor}"
-                                               Margin="-15"
-                                               x:Name="frColor">
-                                            
-                                        </Frame>
+
                                         <Label Text="{Binding Name}"                                               
                                                FontSize="Title"
                                                FontFamily="PokeFont"
@@ -49,7 +56,7 @@
                                                ScaleX="1"
                                                Grid.RowSpan="3"
                                                BackgroundColor="Gray"></Frame>
-                                        
+
                                         <Image Source="{Binding UrlImg}"  
                                                x:Name="ImgPk"
                                                HeightRequest="80"
@@ -66,7 +73,7 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <Grid VerticalOptions="FillAndExpand">
+            <!--<Grid VerticalOptions="FillAndExpand">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -91,7 +98,7 @@
                         Grid.Row="0"/>
 
 
-            </Grid>
+            </Grid>-->
 
         </StackLayout>
     </ContentPage.Content>

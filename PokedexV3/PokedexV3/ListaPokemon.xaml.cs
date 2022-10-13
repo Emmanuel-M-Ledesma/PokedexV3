@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using PokedexV3.Models;
 using PokedexV3.Models.Info;
+using PokedexV3.Models.Lista;
 using PokedexV3.Vistas;
 using System;
 using System.Collections.Generic;
@@ -27,10 +28,11 @@ namespace PokedexV3
         public ListaPokemon()
         {
             InitializeComponent();
-            URL = "https://pokeapi.co/api/v2/pokemon";
+            URL = "https://pokeapi.co/api/v2/pokedex/1";
             UrlDesc = "https://pokeapi.co/api/v2/pokemon-species/";
             _ = GetPokemon(URL);
             BackgroundColor = Color.Black;
+            
 
         }
         public async Task<bool> GetPokemon(string url)
@@ -43,34 +45,17 @@ namespace PokedexV3
             {
 
                 var respString = await respuesta.Content.ReadAsStringAsync();
-                var json = JsonConvert.DeserializeObject<PokeModel>(respString);
-                Siguiente = json.Next;
-                Previo = json.Previous;
-                if (string.IsNullOrEmpty(Previo))
-                {
-                    btPrev.IsVisible = false;
-                }
-                else
-                {
-                    btPrev.IsVisible = true;
-                }
-                if (string.IsNullOrEmpty(Siguiente))
-                {
-                    btNext.IsVisible = false;
-                }
-                else
-                {
-                    btNext.IsVisible = true;
-                }
-                foreach (var poke in json.Results)
+                var json = JsonConvert.DeserializeObject<PokedexModel>(respString);                
+
+                foreach (var poke in json.PokemonEntries)
                 {
 
                     PokeImgModel listModel = new PokeImgModel();
-                    listModel.Name = poke.Name.ToUpper();
-                    listModel.Url = poke.Url;
-                    listModel.UrlImg = "https://img.pokemondb.net/sprites/home/normal/" + poke.Name + ".png";
-                    var  order = await getOrder("https://pokeapi.co/api/v2/pokemon/" + poke.Name, 0);
-                    listModel.frColor = await getColor(order);
+                    listModel.Name = poke.PokemonSpecies.Name.ToUpper();
+                    listModel.Url = poke.PokemonSpecies.Url;
+                    listModel.UrlImg = "https://img.pokemondb.net/sprites/home/normal/" + poke.PokemonSpecies.Name + ".png";
+                    //listModel.frColor = await getColor(poke.EntryNumber);
+                    
                     pokelist.Add(listModel);
                 }   
 
@@ -80,21 +65,7 @@ namespace PokedexV3
             }
             return true;
         }
-        public async Task<long> getOrder(string Url, long orden)
-        {
-            HttpClient http = new HttpClient();
-            InfoImgModel Pokemon = new InfoImgModel();
-            var resp = await http.GetAsync(Url);
-            if (resp.IsSuccessStatusCode)
-            {
-                var respString = await resp.Content.ReadAsStringAsync();
-                var json = JsonConvert.DeserializeObject<InfoPoke>(respString);
-                Pokemon.Id = json.Id;
-                orden = Pokemon.Id;
-                return orden;   
-            }
-            return orden;
-        }
+        
         public async Task<string> getColor(long orden)
         {
             string color = "";
@@ -112,17 +83,6 @@ namespace PokedexV3
             }
             return color;
         }
-        private async void btPrev_Clicked(object sender, EventArgs e)
-        {
-            await GetPokemon(Previo);
-            ListPoke.ScrollTo(1, ScrollToPosition.Start, false);
-        }
-
-        private async void btNext_Clicked(object sender, EventArgs e)
-        {
-            await GetPokemon(Siguiente);
-            ListPoke.ScrollTo(1, ScrollToPosition.Start, false);
-        }
 
         private async void ListPoke_ItemTapped(object sender, ItemTappedEventArgs e)
         {
@@ -130,6 +90,15 @@ namespace PokedexV3
             string x = tappedItem.Name;
             await Navigation.PushAsync(new VistaPokemon(x));
         }
+
+       
+
+        private void btnBuscar_Unfocused(object sender, FocusEventArgs e)
+        {
+
+        }
+
+        
 
         //public Color BGColor(string color)
         //{

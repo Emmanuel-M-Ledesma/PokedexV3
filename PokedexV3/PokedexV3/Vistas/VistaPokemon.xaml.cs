@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using System.Runtime.Serialization;
+using Acr.UserDialogs;
 
 namespace PokedexV3.Vistas
 {
@@ -17,16 +19,21 @@ namespace PokedexV3.Vistas
     {
         public string URL;
         public string UrlDesc;
+        public string UrlEvo;
+        private long Order;
+        
         public VistaPokemon(string data)
         {
             InitializeComponent();
             URL = "https://pokeapi.co/api/v2/pokemon/" + data.ToLower();
             UrlDesc = "https://pokeapi.co/api/v2/pokemon-species/";
+            UrlEvo = "https://pokeapi.co/api/v2/evolution-chain/";
             _ = GetInfo(URL);
-            var navigationPage = new NavigationPage();
+            UserDialogs.Instance.HideLoading();
         }
         public async Task<bool> GetInfo(string Url)
         {
+            UserDialogs.Instance.ShowLoading("Cargando");          
             HttpClient http = new HttpClient();
             InfoImgModel Pokemon = new InfoImgModel();
             var resp = await http.GetAsync(URL);
@@ -58,20 +65,111 @@ namespace PokedexV3.Vistas
 
                     gridtipo.ColumnDefinitions.Add(new ColumnDefinition());
                     gridtipo.Children.Add(btn, i, 0);
+
+                }
+                for (int i = 0; i < json.Abilities.Length; i++)
+                {
+                    Button btn = new Button
+                    {
+                        Text = json.Abilities[i].AbilityAbility.Name,
+                        CornerRadius = 20,
+                        BorderColor = Color.Black,
+                    };
+                    if (json.Abilities[i].IsHidden)
+                    {
+                        btn.Text = btn.Text + " (Oculta)";
+                    }
                     
+                    grHability.RowDefinitions.Add(new RowDefinition());
+                    grHability.Children.Add(btn, 0, i + 1);
                 }
 
-                lblWeight.Text = Pokemon.Weight.ToString().Insert(Pokemon.Weight.ToString().Count() - 1, ",");
-                lblHeight.Text = Pokemon.Height.ToString() + "0";
+                lblWeight.Text = Pokemon.Weight.ToString().Insert(Pokemon.Weight.ToString().Count() - 1, ",") + " Kg.";
+                lblHeight.Text = Pokemon.Height.ToString() + "0 cm.";
                 lblName.Text = Pokemon.Name.ToUpper();
                 ImgPoke.Source = Pokemon.UrlImg;
-                _ = GetFlavor(json.Id);
+                Order = json.Id;
+               
 
             }
+
+            //GetFlavor
+
+            var Detalle = UrlDesc + Order;
+            DetalleModel PokeDetail = new DetalleModel();
+            resp = await http.GetAsync(Detalle);
+            if (resp.IsSuccessStatusCode)
+            {
+                var respString = await resp.Content.ReadAsStringAsync();
+                var json = JsonConvert.DeserializeObject<DetalleModel>(respString);
+                PokeDetail = json;
+                UrlEvo = json.EvolutionChain.Url.ToString();
+
+
+                PokeDetail.FlavorTextEntries = json.FlavorTextEntries;
+                for (int i = 0; i < PokeDetail.FlavorTextEntries.Length; i++)
+                {
+                    if (PokeDetail.FlavorTextEntries[i].Language.Name == "es")
+                    {
+                        lblDesc.Text = PokeDetail.FlavorTextEntries[i].FlavorText.Replace("\n", " ");
+                        i = PokeDetail.FlavorTextEntries.Length;
+                        lblDesc.FontSize = 15;
+                    }
+                    else
+                    {
+                        lblDesc.Text = PokeDetail.FlavorTextEntries[0].FlavorText.Replace("\n", " ");
+                        i = PokeDetail.FlavorTextEntries.Length;
+                        lblDesc.FontSize = 15;
+                    }
+                }
+
+                this.BackgroundColor = Color.Black;
+                Contenido.BackgroundColor = BGColor(PokeDetail.Color.Name);
+            }
+
+
+            //GetEvoChain
+            EvoModel evoModel = new EvoModel();
+            resp = await http.GetAsync(UrlEvo);
+            if (resp.IsSuccessStatusCode)
+            {
+                var respString = await resp.Content.ReadAsStringAsync();
+                var json = JsonConvert.DeserializeObject<EvoModel>(respString);
+
+                evoModel.Chain = json.Chain;
+                Button btn = new Button
+                {
+                    Text = evoModel.Chain.Species.Name,
+                    CornerRadius = 20,
+                };
+                grEvolution.RowDefinitions.Add(new RowDefinition());
+                grEvolution.Children.Add(btn, 0, 1);
+                if (evoModel.Chain.EvolvesTo[0].Species.Name != null)
+                {
+                    Button btn2 = new Button
+                    {
+                        Text = evoModel.Chain.EvolvesTo[0].Species.Name,
+                        CornerRadius = 20,
+                    };
+                    grEvolution.RowDefinitions.Add(new RowDefinition());
+                    grEvolution.Children.Add(btn2, 0, 2);
+                }
+                if (evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name != null)
+                {
+                    Button btn3 = new Button
+                    {
+                        Text = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name,
+                        CornerRadius = 20,
+                    };
+                    grEvolution.RowDefinitions.Add(new RowDefinition());
+                    grEvolution.Children.Add(btn3, 0, 3);
+                }
+            }
+            UserDialogs.Instance.HideLoading();
             return true;
         }
 
-        public async Task<bool> GetFlavor(long order)
+        public async Task<string> GetFlavor(long order)
         {
             var Detalle = UrlDesc + order;
             HttpClient http = new HttpClient();
@@ -81,6 +179,9 @@ namespace PokedexV3.Vistas
             {
                 var respString = await resp.Content.ReadAsStringAsync();
                 var json = JsonConvert.DeserializeObject<DetalleModel>(respString);
+                PokeDetail = json;
+                UrlEvo = json.EvolutionChain.Url.ToString();
+                
 
                 PokeDetail.FlavorTextEntries = json.FlavorTextEntries;
                 for (int i = 0; i < PokeDetail.FlavorTextEntries.Length; i++)
@@ -89,17 +190,50 @@ namespace PokedexV3.Vistas
                     {
                         lblDesc.Text = PokeDetail.FlavorTextEntries[i].FlavorText.Replace("\n", " ");
                         i = PokeDetail.FlavorTextEntries.Length;
+                        lblDesc.FontSize = 15;
                     }
-                }
-
-                PokeDetail = json;
+                }               
 
                 this.BackgroundColor = BGColor(PokeDetail.Color.Name);
-
-
-                //lblDesc.Text = PokeDetail.FlavorTextEntries[1].FlavorText.Replace("\n"," ");
+                Contenido.BackgroundColor = BGColor(PokeDetail.Color.Name);
             }
 
+            return UrlEvo;
+        }
+
+        public async Task<bool> GetEvoChain(string Url)
+        {
+            HttpClient http = new HttpClient();
+            EvoModel evoModel = new EvoModel();
+            var resp = await http.GetAsync(Url);
+            if (resp.IsSuccessStatusCode)
+            {
+                var respString = await resp.Content.ReadAsStringAsync();
+                var json = JsonConvert.DeserializeObject<EvoModel>(respString);
+
+                evoModel.Chain = json.Chain;
+                Button btn = new Button
+                {
+                    Text = evoModel.Chain.Species.Name,
+                    CornerRadius = 20,
+                };
+                grEvolution.RowDefinitions.Add(new RowDefinition());
+                grEvolution.Children.Add(btn, 0, 1);
+                Button btn2 = new Button
+                {
+                    Text = evoModel.Chain.EvolvesTo[0].Species.Name,
+                    CornerRadius = 20,
+                };
+                grEvolution.RowDefinitions.Add(new RowDefinition());
+                grEvolution.Children.Add(btn2, 0, 2);
+                Button btn3 = new Button
+                {
+                    Text = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name,
+                    CornerRadius = 20,
+                };
+                grEvolution.RowDefinitions.Add(new RowDefinition());
+                grEvolution.Children.Add(btn3, 0, 3);
+            }
             return true;
         }
         public string Traduccion(string tipo, string resultado)
@@ -236,36 +370,36 @@ namespace PokedexV3.Vistas
             switch (color)
             {
                 case "red":
-                    resultado = Color.Red;
+                    resultado = Color.FromRgb(255, 153, 154);
                     break;
                 case "blue":
-                    resultado = Color.Blue;
+                    resultado = Color.FromRgb(209, 217, 237);
                     break;
                 case "yellow":
-                    resultado = Color.Yellow;
+                    resultado = Color.FromRgb(255, 255, 205);
                     break;
                 case "green":
-                    resultado = Color.Green;
+                    resultado = Color.FromRgb(203, 246, 204);
                     break;
                 case "black":
-                    resultado = Color.Black;
+                    resultado = Color.FromRgb(51, 51, 47);
                     break;
                 case "brown":
-                    resultado = Color.Brown;
+                    resultado = Color.FromRgb(188, 146, 114);
                     break;
                 case "purple":
-                    resultado = Color.Purple;
+                    resultado = Color.FromRgb(198, 158, 221);
                     break;
                 case "gray":
-                    resultado = Color.Gray;
+                    resultado = Color.FromRgb(165, 165, 152);
                     break;
                 case "white":
-                    resultado = Color.White;
+                    resultado = Color.FromRgb(237, 255, 234);
                     break;
                 case "pink":
-                    resultado = Color.Pink;
+                    resultado = Color.FromRgb(246, 204, 227);
                     break;
-                
+
 
             }
             return resultado;
