@@ -28,6 +28,13 @@ namespace PokedexV3
         public ListaPokemon()
         {
             InitializeComponent();
+            ToolbarItem item = new ToolbarItem
+            {
+                Text = "Buscar",
+                Priority = 5,
+                Order = ToolbarItemOrder.Secondary
+            };
+            //item.Clicked += BuscarClicked;
             URL = "https://pokeapi.co/api/v2/pokedex/1";
             UrlDesc = "https://pokeapi.co/api/v2/pokemon-species/";
             _ = GetPokemon(URL);
@@ -35,6 +42,17 @@ namespace PokedexV3
             
 
         }
+
+        private void BuscarClicked(object sender, EventArgs e)
+        {
+            Mostrarbarra();
+            
+        }
+        private void FiltrarClicked(Object sender, EventArgs e)
+        {
+
+        }
+
         public async Task<bool> GetPokemon(string url)
         {
 
@@ -50,12 +68,14 @@ namespace PokedexV3
                 foreach (var poke in json.PokemonEntries)
                 {
 
-                    PokeImgModel listModel = new PokeImgModel();
-                    listModel.Name = poke.PokemonSpecies.Name.ToUpper();
-                    listModel.Url = poke.PokemonSpecies.Url;
-                    listModel.UrlImg = "https://img.pokemondb.net/sprites/home/normal/" + poke.PokemonSpecies.Name + ".png";
-                    //listModel.frColor = await getColor(poke.EntryNumber);
+                    PokeImgModel listModel = new PokeImgModel
+                    {
+                        Name = poke.PokemonSpecies.Name.ToUpper(),
+                        Url = poke.PokemonSpecies.Url,
+                        UrlImg = "https://img.pokemondb.net/sprites/home/normal/" + poke.PokemonSpecies.Name + ".png"
+                    };
                     
+
                     pokelist.Add(listModel);
                 }   
 
@@ -88,58 +108,23 @@ namespace PokedexV3
         {
             var tappedItem = e.Item as PokeImgModel;
             string x = tappedItem.Name;
+            Mostrarbarra();
             await Navigation.PushAsync(new VistaPokemon(x));
         }
-
-       
-
-        private void btnBuscar_Unfocused(object sender, FocusEventArgs e)
+        private void Mostrarbarra()
         {
+            if (Buscar.IsVisible)
+            {
+                Buscar.IsVisible = false;
+                ToolbarItems[0].IconImageSource = "SearchIcon.png";
+            }
+            else
+            {
+                Buscar.IsVisible = true;
+                ToolbarItems[0].IconImageSource = "CloseIcon.png";
+            }
 
         }
-
-        
-
-        //public Color BGColor(string color)
-        //{
-        //    Color resultado = new Color();
-        //    switch (color)
-        //    {
-        //        case "red":
-        //            resultado = Color.Red;
-        //            break;
-        //        case "blue":
-        //            resultado = Color.Blue;
-        //            break;
-        //        case "yellow":
-        //            resultado = Color.Yellow;
-        //            break;
-        //        case "green":
-        //            resultado = Color.Green;
-        //            break;
-        //        case "black":
-        //            resultado = Color.Black;
-        //            break;
-        //        case "brown":
-        //            resultado = Color.Brown;
-        //            break;
-        //        case "purple":
-        //            resultado = Color.Purple;
-        //            break;
-        //        case "gray":
-        //            resultado = Color.Gray;
-        //            break;
-        //        case "white":
-        //            resultado = Color.White;
-        //            break;
-        //        case "pink":
-        //            resultado = Color.Pink;
-        //            break;
-
-
-        //    }
-        //    return resultado;
-        //}
 
     }
 }

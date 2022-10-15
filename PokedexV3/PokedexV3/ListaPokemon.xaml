@@ -5,24 +5,26 @@
              Title="Lista de Pokémon"
              NavigationPage.HasNavigationBar="True">
 
-    <NavigationPage.TitleView>
-        <StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal">
-            <Label
-                HorizontalOptions="CenterAndExpand"  
-                HorizontalTextAlignment="Start"
-                VerticalTextAlignment="Center"
-                Text="Lista de Pokemon"
-                TextColor="White"
-                VerticalOptions="Center" />
-            <SearchBar  HorizontalOptions="EndAndExpand"  
-                        Margin="0,2,10,2"/>
-
-        </StackLayout>
-    </NavigationPage.TitleView>
-
+    
+    <ContentPage.ToolbarItems>
+        <ToolbarItem IconImageSource="SearchIcon.png" Priority="1" Order="Primary" Clicked="BuscarClicked" />
+        <ToolbarItem IconImageSource="FilterIcon.png" Priority="0" Order="Primary" Clicked="FiltrarClicked" />
+    </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout>
-            <ListView x:Name="ListPoke" Background="white" BackgroundColor="White" SeparatorColor="Gray" SelectionMode="Single" VerticalOptions="End" RowHeight="100" ItemTapped="ListPoke_ItemTapped">
+            <SearchBar  HorizontalOptions="FillAndExpand"  
+                        Margin="00,2,0,0"
+                        IsVisible="false"
+                        x:Name="Buscar"
+                        BackgroundColor="White"/>
+            <ListView x:Name="ListPoke" 
+                      Background="white" 
+                      BackgroundColor="White" 
+                      SeparatorColor="Gray" 
+                      SelectionMode="Single" 
+                      VerticalOptions="End" 
+                      RowHeight="100" 
+                      ItemTapped="ListPoke_ItemTapped">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>

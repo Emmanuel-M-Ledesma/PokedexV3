@@ -21,7 +21,7 @@ namespace PokedexV3.Vistas
         public string UrlDesc;
         public string UrlEvo;
         private long Order;
-        
+
         public VistaPokemon(string data)
         {
             InitializeComponent();
@@ -29,11 +29,11 @@ namespace PokedexV3.Vistas
             UrlDesc = "https://pokeapi.co/api/v2/pokemon-species/";
             UrlEvo = "https://pokeapi.co/api/v2/evolution-chain/";
             _ = GetInfo(URL);
-            UserDialogs.Instance.HideLoading();
+            GridContenido.IsVisible = false;
+            GridContenido.IsVisible = true;
         }
         public async Task<bool> GetInfo(string Url)
         {
-            UserDialogs.Instance.ShowLoading("Cargando");          
             HttpClient http = new HttpClient();
             InfoImgModel Pokemon = new InfoImgModel();
             var resp = await http.GetAsync(URL);
@@ -61,8 +61,6 @@ namespace PokedexV3.Vistas
                         TextColor = Color.FromRgb(13, 13, 12),
                         BorderColor = Color.Black,
                     };
-
-
                     gridtipo.ColumnDefinitions.Add(new ColumnDefinition());
                     gridtipo.Children.Add(btn, i, 0);
 
@@ -79,7 +77,7 @@ namespace PokedexV3.Vistas
                     {
                         btn.Text = btn.Text + " (Oculta)";
                     }
-                    
+
                     grHability.RowDefinitions.Add(new RowDefinition());
                     grHability.Children.Add(btn, 0, i + 1);
                 }
@@ -89,7 +87,7 @@ namespace PokedexV3.Vistas
                 lblName.Text = Pokemon.Name.ToUpper();
                 ImgPoke.Source = Pokemon.UrlImg;
                 Order = json.Id;
-               
+
 
             }
 
@@ -115,15 +113,16 @@ namespace PokedexV3.Vistas
                         i = PokeDetail.FlavorTextEntries.Length;
                         lblDesc.FontSize = 15;
                     }
-                    else
-                    {
-                        lblDesc.Text = PokeDetail.FlavorTextEntries[0].FlavorText.Replace("\n", " ");
-                        i = PokeDetail.FlavorTextEntries.Length;
-                        lblDesc.FontSize = 15;
-                    }
+
+                }
+                if (lblDesc.Text == "")
+                {
+                    lblDesc.Text = PokeDetail.FlavorTextEntries[0].FlavorText.Replace("\n", " ");
+
+                    lblDesc.FontSize = 15;
                 }
 
-                this.BackgroundColor = Color.Black;
+                //BackgroundColor = BGColor(PokeDetail.Color.Name);
                 Contenido.BackgroundColor = BGColor(PokeDetail.Color.Name);
             }
 
@@ -144,17 +143,19 @@ namespace PokedexV3.Vistas
                 };
                 grEvolution.RowDefinitions.Add(new RowDefinition());
                 grEvolution.Children.Add(btn, 0, 1);
-                if (evoModel.Chain.EvolvesTo[0].Species.Name != null)
+                if (evoModel.Chain.EvolvesTo.Length != 0)
                 {
+                    
                     Button btn2 = new Button
                     {
                         Text = evoModel.Chain.EvolvesTo[0].Species.Name,
                         CornerRadius = 20,
                     };
                     grEvolution.RowDefinitions.Add(new RowDefinition());
-                    grEvolution.Children.Add(btn2, 0, 2);
+                    grEvolution.Children.Add(btn2,0, 2);
                 }
-                if (evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name != null)
+                
+                if (evoModel.Chain.EvolvesTo[0].EvolvesTo.Length != 0)
                 {
                     Button btn3 = new Button
                     {
@@ -164,8 +165,11 @@ namespace PokedexV3.Vistas
                     grEvolution.RowDefinitions.Add(new RowDefinition());
                     grEvolution.Children.Add(btn3, 0, 3);
                 }
+                else
+                {
+                    btnTE.IsVisible = false;
+                }
             }
-            UserDialogs.Instance.HideLoading();
             return true;
         }
 
@@ -181,7 +185,7 @@ namespace PokedexV3.Vistas
                 var json = JsonConvert.DeserializeObject<DetalleModel>(respString);
                 PokeDetail = json;
                 UrlEvo = json.EvolutionChain.Url.ToString();
-                
+
 
                 PokeDetail.FlavorTextEntries = json.FlavorTextEntries;
                 for (int i = 0; i < PokeDetail.FlavorTextEntries.Length; i++)
@@ -192,10 +196,10 @@ namespace PokedexV3.Vistas
                         i = PokeDetail.FlavorTextEntries.Length;
                         lblDesc.FontSize = 15;
                     }
-                }               
+                }
 
-                this.BackgroundColor = BGColor(PokeDetail.Color.Name);
-                Contenido.BackgroundColor = BGColor(PokeDetail.Color.Name);
+                BackgroundColor = BGColor(PokeDetail.Color.Name);
+                //Contenido.BackgroundColor = BGColor(PokeDetail.Color.Name);
             }
 
             return UrlEvo;

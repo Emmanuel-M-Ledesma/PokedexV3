@@ -10,7 +10,8 @@
             <StackLayout>
                 <!--Imagen del pokemon-->
                 <Frame x:Name="Contenido" 
-                   CornerRadius="30">
+                       CornerRadius="30"
+                       TranslationY="-30">
                     <Grid >
                         <Frame  x:Name="circleFrame" 
                                 HasShadow="False" 
@@ -18,7 +19,8 @@
                                 Margin="10" 
                                 VerticalOptions="Center" 
                                 HorizontalOptions="Center" 
-                                BackgroundColor="Gray">
+                                BackgroundColor="black"
+                                TranslationY="10">
                             <Frame.CornerRadius>
                                 <OnPlatform x:TypeArguments="x:Single">
                                     <On Platform="Android" Value="150"/>
@@ -34,181 +36,210 @@
                     </Grid>
                 </Frame >
                 <!--Tipos del pokemon-->
-                <Grid x:Name="gridtipo"  >
+                <Grid x:Name="gridtipo" TranslationY="-30" >
 
                 </Grid>
-                <!--Datos del pokemon-->
-                <Frame CornerRadius="30" BackgroundColor="Gray">
-                    <Grid >
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="5"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="5"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                <!---Grid Contenedor-->
+                <Grid x:Name="GridContenido" BackgroundColor="Gray" TranslationY="20" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <!--Datos del pokemon-->
+                    <Frame CornerRadius="30" 
+                           BackgroundColor="Black" 
+                           HasShadow="True"
+                           Grid.Row="0"
+                           TranslationY="-50" >
+                        <Grid >
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                                <RowDefinition Height="30"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="5"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="5"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                        <Label Text="Nombre: "
+                            <Label Text="Nombre: "
                                Grid.Column="0"
                                Grid.Row="0"
                                HorizontalOptions="Center"
                                FontFamily="PokeFont.ttf"
                                FontSize="15"/>
-                        <Label Text="{Binding Name}"
+                            <Label Text="{Binding Name}"
                                Grid.Column="0"
                                Grid.Row="1"
                                x:Name="lblName"
                                HorizontalOptions="Center"
                                FontFamily="PokeFont.ttf"
                                FontSize="15"/>
-                        <Label Text="Altura: "
+                            <Label Text="Altura: "
                                Grid.Column="2"
                                Grid.Row="0"
                                HorizontalOptions="Center"
                                FontFamily="PokeFont.ttf"
                                FontSize="15"/>
-                        <Label Text="{Binding Height}"
+                            <Label Text="{Binding Height}"
                                Grid.Column="2"
                                Grid.Row="1"
                                x:Name="lblHeight"
                                HorizontalOptions="Center"
                                FontFamily="PokeFont.ttf"
                                FontSize="15"/>
-                        <Label Text="Peso: "
+                            <Label Text="Peso: "
                                Grid.Column="4"
                                Grid.Row="0"
                                HorizontalOptions="Center"
                                FontFamily="PokeFont.ttf"
                                FontSize="15"/>
-                        <Label Text="{Binding Weight}"
+                            <Label Text="{Binding Weight}"
                                Grid.Column="4"
                                Grid.Row="1"
                                x:Name="lblWeight"
                                HorizontalOptions="Center"
                                FontFamily="PokeFont.ttf"
                                FontSize="15"/>
-                        <Line X1="0"
+                            <Line X1="0"
                               X2="0"
                               Y1="-200"
                               Y2="200" 
-                              Stroke="Black"
+                              Stroke="gray"
                               Grid.Column="2"
                               Grid.Row="0"
                               Grid.RowSpan="2"
                               Margin="-10" 
                               StrokeThickness="3"/>
-                        <Line X1="0"
+                            <Line X1="0"
                               X2="0"
                               Y1="-200"
                               Y2="200" 
-                              Stroke="Black"
+                              Stroke="gray"
                               Grid.Column="4"
                               Grid.Row="0"
                               Grid.RowSpan="2"
                               Margin="-10" 
                               StrokeThickness="3"/>
-                    </Grid>
-                </Frame>
-                <!--Dato del pokemon-->
-                <Frame CornerRadius="30" 
-                       BackgroundColor="Gray" 
-                       >
-                    <Grid x:Name="gridDetalle" >
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Label Text="DATO" 
+                        </Grid>
+                    </Frame>
+                    <!--Dato del pokemon-->
+                    <Frame CornerRadius="30" 
+                       BackgroundColor="Black" 
+                       HasShadow="True"
+                       Grid.Row="1" TranslationY="-50">
+                        <Grid x:Name="gridDetalle" >
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Text="DATO" 
                                Grid.Row="0" 
                                HorizontalOptions="Center"
                                VerticalOptions="Start"
                                FontFamily="PokeFont.ttf"
                                FontSize="Title"
                                Margin="-10">
-                        </Label>
-                        <Line Grid.Column="0"
+                            </Label>
+                            <Line Grid.Column="0"
                               Grid.Row="0"
                               X1="310"
                               X2="80"
                               Y1="30"
                               Y2="30" 
-                              Stroke="Black"
+                              Stroke="gray"
                               Margin="-20" 
                               StrokeThickness="2"
                               >
 
-                        </Line>
-                        <Label x:Name="lblDesc"
+                            </Line>
+                            <Label x:Name="lblDesc"
                            Text="{Binding FlavorText}"
                                Grid.Row="1"
                                 FontFamily="PokeFont.ttf">
 
-                        </Label>
-                    </Grid>
-                </Frame>
-                <!--Habilidades del pokemon-->
-                <Frame CornerRadius="30" BackgroundColor="Gray">
-                    <Grid x:Name="grHability" BackgroundColor="Gray">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Label Text="HABILIDADES" 
+                            </Label>
+                        </Grid>
+                    </Frame>
+                    <!--Habilidades del pokemon-->
+                    <Frame CornerRadius="30" 
+                           BackgroundColor="Black" 
+                           HasShadow="True"
+                           Grid.Row="2" TranslationY="-50">
+                        <Grid x:Name="grHability">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="AUTO"/>
+                            </Grid.RowDefinitions>
+                            <Label Text="HABILIDADES" 
                                Grid.Row="0" 
                                HorizontalOptions="Center"
                                VerticalOptions="Start"
                                FontFamily="PokeFont.ttf"
                                FontSize="Title">
-                        </Label>
-                        <Line Grid.Column="0"
+                            </Label>
+                            <Line Grid.Column="0"
                           Grid.Row="0"
                           X1="300"
                           X2="70"
                           Y1="30"
                           Y2="30" 
-                          Stroke="Black"
+                          Stroke="GRAY"
                           Margin="-10" 
                           StrokeThickness="2"
                               >
 
-                        </Line>
-                    </Grid>
-                </Frame>                
-                <!--Cadena de evolucion-->
-                <Frame CornerRadius="30" BackgroundColor="Gray">
-                    <Grid x:Name="grEvolution" BackgroundColor="Gray">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>
-                        <Label Text="CADENA DE EVOLUCION" 
+                            </Line>
+                        </Grid>
+                    </Frame>
+                    <!--Cadena de evolucion-->
+                    <Frame CornerRadius="30" 
+                           BackgroundColor="Black" 
+                           HasShadow="True"
+                           Grid.Row="3"
+                           BorderColor="Gray"
+                           TranslationY="-50" >
+                        <Grid x:Name="grEvolution">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+
+                            <Label Text="CADENA DE EVOLUCION" 
                                Grid.Row="0" 
                                HorizontalOptions="Center"
                                VerticalOptions="Start"
-                                FontFamily="PokeFont.ttf"
+                               FontFamily="PokeFont.ttf"
                                FontSize="Title">
-                        </Label>
-                        <Line Grid.Column="0"
+                            </Label>
+                            <Line Grid.Column="0"
                               Grid.Row="0"
                               X1="300"
                               X2="70"
                               Y1="30"
                               Y2="30" 
-                              Stroke="Black"
+                              Stroke="gray"
                               Margin="-10" 
-                              StrokeThickness="2"
-                              >
+                              StrokeThickness="2">
+                            </Line>
+                            <Button Text="" Grid.Row="1" CornerRadius="20"/>
+                            <Button Text="" Grid.Row="2" CornerRadius="20"/>
+                            <Button Text="" Grid.Row="3" CornerRadius="20" x:Name="btnTE"/>
 
-                        </Line>
-                    </Grid>
-                </Frame>
+                        </Grid>
+                    </Frame>
+                    
+                    <Label></Label>
+                </Grid>
             </StackLayout>
         </ScrollView>
     </ContentPage.Content>
-    
 </ContentPage>
