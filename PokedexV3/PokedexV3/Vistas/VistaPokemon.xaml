@@ -231,7 +231,7 @@
                               StrokeThickness="2">
                             </Line>
                             <Button Text="" Grid.Row="1" CornerRadius="20"/>
-                            <Button Text="" Grid.Row="2" CornerRadius="20"/>
+                            <Button Text="" Grid.Row="2" CornerRadius="20" x:Name="btnSE"/>
                             <Button Text="" Grid.Row="3" CornerRadius="20" x:Name="btnTE"/>
 
                         </Grid>

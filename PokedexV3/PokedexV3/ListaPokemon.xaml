@@ -8,7 +8,7 @@
     
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="SearchIcon.png" Priority="1" Order="Primary" Clicked="BuscarClicked" />
-        <ToolbarItem IconImageSource="FilterIcon.png" Priority="0" Order="Primary" Clicked="FiltrarClicked" />
+        <ToolbarItem IconImageSource="FilterIcon.png" Priority="0" Order="Primary" Clicked="ToolbarItem_Clicked" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout>
@@ -16,7 +16,8 @@
                         Margin="00,2,0,0"
                         IsVisible="false"
                         x:Name="Buscar"
-                        BackgroundColor="White"/>
+                        BackgroundColor="White"
+                        SearchButtonPressed="Buscar_SearchButtonPressed"/>
             <ListView x:Name="ListPoke" 
                       Background="white" 
                       BackgroundColor="White" 

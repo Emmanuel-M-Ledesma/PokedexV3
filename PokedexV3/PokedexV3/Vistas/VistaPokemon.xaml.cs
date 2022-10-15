@@ -145,28 +145,33 @@ namespace PokedexV3.Vistas
                 grEvolution.Children.Add(btn, 0, 1);
                 if (evoModel.Chain.EvolvesTo.Length != 0)
                 {
-                    
+
                     Button btn2 = new Button
                     {
                         Text = evoModel.Chain.EvolvesTo[0].Species.Name,
                         CornerRadius = 20,
                     };
                     grEvolution.RowDefinitions.Add(new RowDefinition());
-                    grEvolution.Children.Add(btn2,0, 2);
-                }
-                
-                if (evoModel.Chain.EvolvesTo[0].EvolvesTo.Length != 0)
-                {
-                    Button btn3 = new Button
+                    grEvolution.Children.Add(btn2, 0, 2);
+                    if (evoModel.Chain.EvolvesTo[0].EvolvesTo.Length != 0)
                     {
-                        Text = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name,
-                        CornerRadius = 20,
-                    };
-                    grEvolution.RowDefinitions.Add(new RowDefinition());
-                    grEvolution.Children.Add(btn3, 0, 3);
+                        Button btn3 = new Button
+                        {
+                            Text = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name,
+                            CornerRadius = 20,
+                        };
+                        grEvolution.RowDefinitions.Add(new RowDefinition());
+                        grEvolution.Children.Add(btn3, 0, 3);
+                    }
+                    else
+                    {
+                       
+                        btnTE.IsVisible = false;
+                    }
                 }
                 else
                 {
+                    btnSE.IsVisible = false;
                     btnTE.IsVisible = false;
                 }
             }
