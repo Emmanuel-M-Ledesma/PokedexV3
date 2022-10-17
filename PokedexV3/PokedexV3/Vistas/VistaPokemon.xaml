@@ -52,6 +52,7 @@
                            BackgroundColor="Black" 
                            HasShadow="True"
                            Grid.Row="0"
+                           BorderColor="Gray"
                            TranslationY="-50" >
                         <Grid >
                             <Grid.RowDefinitions>
@@ -78,7 +79,7 @@
                                x:Name="lblName"
                                HorizontalOptions="Center"
                                FontFamily="PokeFont.ttf"
-                               FontSize="15"/>
+                               FontSize="25"/>
                             <Label Text="Altura: "
                                Grid.Column="2"
                                Grid.Row="0"
@@ -91,7 +92,7 @@
                                x:Name="lblHeight"
                                HorizontalOptions="Center"
                                FontFamily="PokeFont.ttf"
-                               FontSize="15"/>
+                               FontSize="25"/>
                             <Label Text="Peso: "
                                Grid.Column="4"
                                Grid.Row="0"
@@ -104,7 +105,7 @@
                                x:Name="lblWeight"
                                HorizontalOptions="Center"
                                FontFamily="PokeFont.ttf"
-                               FontSize="15"/>
+                               FontSize="25"/>
                             <Line X1="0"
                               X2="0"
                               Y1="-200"
@@ -131,6 +132,7 @@
                     <Frame CornerRadius="30" 
                        BackgroundColor="Black" 
                        HasShadow="True"
+                           BorderColor="Gray"
                        Grid.Row="1" TranslationY="-50">
                         <Grid x:Name="gridDetalle" >
                             <Grid.RowDefinitions>
@@ -172,6 +174,8 @@
                     <Frame CornerRadius="30" 
                            BackgroundColor="Black" 
                            HasShadow="True"
+                           
+                           BorderColor="Gray"
                            Grid.Row="2" TranslationY="-50">
                         <Grid x:Name="grHability">
                             <Grid.RowDefinitions>
