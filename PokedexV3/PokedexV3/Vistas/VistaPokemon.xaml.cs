@@ -31,7 +31,7 @@ namespace PokedexV3.Vistas
             _ = GetInfo(URL);
             GridContenido.IsVisible = false;
             GridContenido.IsVisible = true;
-            
+
         }
         public async Task<bool> GetInfo(string Url)
         {
@@ -143,11 +143,26 @@ namespace PokedexV3.Vistas
 
                 if (evoModel.Chain.EvolvesTo.Length != 0)
                 {
-                    txtSE.Text = evoModel.Chain.EvolvesTo[0].Species.Name;
-                    ImgSE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[0].Species.Name + ".png";
+                    if (evoModel.Chain.Species.Name == "eevee")
+                    {
+                        for (int i = 0; i < evoModel.Chain.EvolvesTo.Length; i++)
+                        {
+                            if (evoModel.Chain.EvolvesTo[i].Species.Name == Pokemon.Name)
+                            {
+                                txtSE.Text = evoModel.Chain.EvolvesTo[i].Species.Name;
+                                ImgSE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[i].Species.Name + ".png";
+                            }
+                        }
+                    }
+                    else
+                    {
+                        txtSE.Text = evoModel.Chain.EvolvesTo[0].Species.Name;
+                        ImgSE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[0].Species.Name + ".png";
+                    }
 
                     if (evoModel.Chain.EvolvesTo[0].EvolvesTo.Length != 0)
                     {
+
                         txtTE.Text = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name;
                         ImgTE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name + ".png";
 
