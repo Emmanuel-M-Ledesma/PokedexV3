@@ -31,6 +31,7 @@ namespace PokedexV3.Vistas
             _ = GetInfo(URL);
             GridContenido.IsVisible = false;
             GridContenido.IsVisible = true;
+            
         }
         public async Task<bool> GetInfo(string Url)
         {
@@ -136,44 +137,36 @@ namespace PokedexV3.Vistas
                 var json = JsonConvert.DeserializeObject<EvoModel>(respString);
 
                 evoModel.Chain = json.Chain;
-                Button btn = new Button
-                {
-                    Text = evoModel.Chain.Species.Name,
-                    CornerRadius = 20,
-                };
-                grEvolution.RowDefinitions.Add(new RowDefinition());
-                grEvolution.Children.Add(btn, 0, 1);
+
+                txtPE.Text = evoModel.Chain.Species.Name;
+                ImgPE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.Species.Name + ".png";
+
                 if (evoModel.Chain.EvolvesTo.Length != 0)
                 {
+                    txtSE.Text = evoModel.Chain.EvolvesTo[0].Species.Name;
+                    ImgSE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[0].Species.Name + ".png";
 
-                    Button btn2 = new Button
-                    {
-                        Text = evoModel.Chain.EvolvesTo[0].Species.Name,
-                        CornerRadius = 20,
-                    };
-                    grEvolution.RowDefinitions.Add(new RowDefinition());
-                    grEvolution.Children.Add(btn2, 0, 2);
                     if (evoModel.Chain.EvolvesTo[0].EvolvesTo.Length != 0)
                     {
-                        Button btn3 = new Button
-                        {
-                            Text = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name,
-                            CornerRadius = 20,
-                        };
-                        grEvolution.RowDefinitions.Add(new RowDefinition());
-                        grEvolution.Children.Add(btn3, 0, 3);
+                        txtTE.Text = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name;
+                        ImgTE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name + ".png";
+
+
                     }
                     else
                     {
-                       
-                        btnTE.IsVisible = false;
+                        frTE.IsVisible = false;
+                        txtTE.Text = "";
                     }
                 }
                 else
                 {
-                    btnSE.IsVisible = false;
-                    btnTE.IsVisible = false;
+                    txtSE.Text = "";
+                    txtTE.Text = "";
+                    frSE.IsVisible = false;
+                    frTE.IsVisible = false;
                 }
+
             }
             return true;
         }
