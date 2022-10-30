@@ -213,6 +213,7 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"/>
                                 <RowDefinition Height="130"/>
+                                <RowDefinition Height="auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -243,6 +244,7 @@
                             </Line>
                             <Label Text="→" Grid.Row="1" Grid.Column="1" VerticalTextAlignment="Center" FontSize="25" x:Name="lblT1"></Label>
                             <Label Text="→" Grid.Row="1" Grid.Column="3" VerticalTextAlignment="Center" FontSize="25" x:Name="lblT2"></Label>
+                            <Label Text="⬊" Grid.Row="1" Grid.Column="3" VerticalTextAlignment="End" FontSize="25" x:Name="lblTP2" IsVisible="false"></Label>
                             <Frame x:Name="frPE" Grid.Column="0" Grid.Row="1" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="Gray">
                                 <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgPE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgPE_Clicked" CommandParameter=""/>
                             </Frame>
@@ -258,7 +260,11 @@
                                 <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgTE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgTE_Clicked"/>
                             </Frame>
                             <Label Text="Vacio" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="1" Grid.Column="4" Grid.RowSpan="1" x:Name="txtTE" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" TranslationY="-10"/>
-
+                            
+                            <Frame x:Name="frTPE" HeightRequest="100" Grid.Column="4" Grid.Row="2" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="Gray">
+                                <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgTPE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgTPE_Clicked"/>
+                            </Frame>
+                            <Label Text="Vacio" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="2" Grid.Column="4" Grid.RowSpan="1" x:Name="txtTPE" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" TranslationY="-10"/>
                         </Grid>
                     </Frame>
 

@@ -11,6 +11,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using System.Runtime.Serialization;
 using Acr.UserDialogs;
+using System.ComponentModel.Design;
 
 namespace PokedexV3.Vistas
 {
@@ -194,14 +195,62 @@ namespace PokedexV3.Vistas
 
                     if (evoModel.Chain.EvolvesTo[0].EvolvesTo.Length != 0)
                     {
-                        if (Pokemon.Name == evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name)
+                        string url = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Url.ToString();
+                        string nombre = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name;
+                        string url2 = "", nombre2 = "", nombre3;
+                        if (evoModel.Chain.EvolvesTo[0].EvolvesTo.Length > 1)
+                        {
+                            lblTP2.IsVisible = true;
+                            for (int i = 0; i < evoModel.Chain.EvolvesTo[0].EvolvesTo.Length; i++)
+                            {
+                                nombre3 = "vacio";
+                                if (evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Name == Pokemon.Name)
+                                {
+
+                                    frTE.BackgroundColor = Contenido.BackgroundColor;
+                                    ImgTE.BackgroundColor = Contenido.BackgroundColor;
+                                    nombre = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Name;
+                                    nombre3 = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Name;
+                                    url = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Url.ToString();
+                                    grEvolution.Children.Remove(frTPE);
+                                    grEvolution.Children.Remove(txtTPE);
+                                    grEvolution.Children.Remove(lblTP2);
+
+                                }
+                                if (i == 0 && nombre3 == "vacio" )
+                                {
+                                    nombre = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Name;
+                                    url = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Url.ToString();
+
+                                }
+                                if (i == 1 && nombre3 == "vacio")
+                                {
+                                    nombre2 = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Name;
+                                    url2 = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Url.ToString();
+
+                                }
+
+                            }
+                        }
+                        else if (Pokemon.Name == evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name)
                         {
                             frTE.BackgroundColor = Contenido.BackgroundColor;
                             ImgTE.BackgroundColor = Contenido.BackgroundColor;
                         }
-                        txtTE.Text = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name;
-                        ImgTE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name + ".png";
-                        ImgTE.CommandParameter = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Url;
+                        if (nombre2 != "" && url2 != "")
+                        {
+                            txtTPE.Text = nombre2;
+                            ImgTPE.Source = "https://img.pokemondb.net/sprites/home/normal/" + nombre2 + ".png";
+                            ImgTPE.CommandParameter = url2;
+                        }
+                        else
+                        {
+                            grEvolution.Children.Remove(frTPE);
+                            grEvolution.Children.Remove(txtTPE);
+                        }
+                        txtTE.Text = nombre;
+                        ImgTE.Source = "https://img.pokemondb.net/sprites/home/normal/" + nombre + ".png";
+                        ImgTE.CommandParameter = url;
 
                     }
                     else
@@ -454,5 +503,10 @@ namespace PokedexV3.Vistas
             await DisplayAlert(habilidad, texto, "Cerrar");
         }
 
+        private async void ImgTPE_Clicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new VistaPokemon(txtTPE.Text, ImgTPE.CommandParameter.ToString()));
+            
+        }
     }
 }
