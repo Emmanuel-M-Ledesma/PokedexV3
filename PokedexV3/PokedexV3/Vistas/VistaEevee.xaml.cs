@@ -7,40 +7,98 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
-using System.Runtime.Serialization;
-using Acr.UserDialogs;
 
 namespace PokedexV3.Vistas
 {
     [XamlCompilation(XamlCompilationOptions.Compile)]
-    public partial class VistaPokemon : ContentPage
+    public partial class VistaEevee : ContentPage
     {
         public string URL;
         public string UrlDesc;
         public string UrlEvo;
-        private string flavor;
         private long Order;
+        private string flavor;
 
-        public VistaPokemon(string Nombre, string url)
+        public VistaEevee(string data)
         {
             InitializeComponent();
-            URL = "https://pokeapi.co/api/v2/pokemon/";
-            UrlDesc = url.ToLower();
+            URL = "https://pokeapi.co/api/v2/pokemon/" + data.ToLower();
+            UrlDesc = "https://pokeapi.co/api/v2/pokemon-species/";
             UrlEvo = "https://pokeapi.co/api/v2/evolution-chain/";
             _ = GetInfo(URL);
             GridContenido.IsVisible = false;
             GridContenido.IsVisible = true;
-
         }
         public async Task<bool> GetInfo(string Url)
         {
+            HttpClient http = new HttpClient();
+            InfoImgModel Pokemon = new InfoImgModel();
+            var resp = await http.GetAsync(URL);
+            if (resp.IsSuccessStatusCode)
+            {
+                var respString = await resp.Content.ReadAsStringAsync();
+                var json = JsonConvert.DeserializeObject<InfoPoke>(respString);
+
+
+                Pokemon.UrlImg = "https://img.pokemondb.net/sprites/home/normal/" + json.Name + ".png";
+                Pokemon.Name = json.Name;
+                Pokemon.Height = json.Height;
+                Pokemon.Weight = json.Weight;
+                Pokemon.Types = json.Types;
+
+                for (int i = 0; i < json.Types.Length; i++)
+                {
+                    var res = Traduccion(Pokemon.Types[i].Type.Name, "");
+                    Button btn = new Button
+                    {
+                        Text = res,
+                        IsEnabled = true,
+                        CornerRadius = 50,
+                        BackgroundColor = ColorTipo(Pokemon.Types[i].Type.Name),
+                        TextColor = Color.FromRgb(13, 13, 12),
+                        BorderColor = Color.Black,
+                    };
+                    gridtipo.ColumnDefinitions.Add(new ColumnDefinition());
+                    gridtipo.Children.Add(btn, i, 0);
+
+                }
+                for (int i = 0; i < json.Abilities.Length; i++)
+                {
+                    Button btn = new Button
+                    {
+                        Text = json.Abilities[i].AbilityAbility.Name,
+                        CornerRadius = 20,
+                        BorderColor = Color.Black,
+                        CommandParameter = json.Abilities[i].AbilityAbility.Url,
+                        
+                    };
+                    if (json.Abilities[i].IsHidden)
+                    {
+                        btn.Text = btn.Text + " (Oculta)";
+                    }
+                    btn.Clicked += HandlerComun;
+
+                    grHability.RowDefinitions.Add(new RowDefinition());
+                    grHability.Children.Add(btn, 0, i + 1);
+                }
+
+                lblWeight.Text = Pokemon.Weight.ToString().Insert(Pokemon.Weight.ToString().Count() - 1, ",") + " Kg.";
+                lblHeight.Text = Pokemon.Height.ToString() + "0 cm.";
+                lblName.Text = Pokemon.Name.ToUpper();
+                ImgPoke.Source = Pokemon.UrlImg;
+                Order = json.Id;
+
+
+            }
+
             //GetFlavor
 
-            HttpClient http = new HttpClient();
+            var Detalle = UrlDesc + Order;
             DetalleModel PokeDetail = new DetalleModel();
-            var resp = await http.GetAsync(UrlDesc);
+            resp = await http.GetAsync(Detalle);
             if (resp.IsSuccessStatusCode)
             {
                 var respString = await resp.Content.ReadAsStringAsync();
@@ -71,77 +129,6 @@ namespace PokedexV3.Vistas
                 Contenido.BackgroundColor = BGColor(PokeDetail.Color.Name);
             }
 
-            string Gpk = URL + PokeDetail.Order;
-            InfoImgModel Pokemon = new InfoImgModel();
-            resp = await http.GetAsync(Gpk);
-            if (resp.IsSuccessStatusCode)
-            {
-                var respString = await resp.Content.ReadAsStringAsync();
-                var json = JsonConvert.DeserializeObject<InfoPoke>(respString);
-
-
-                Pokemon.UrlImg = "https://img.pokemondb.net/sprites/home/normal/" + PokeDetail.Name + ".png";
-                Pokemon.Name = PokeDetail.Name;
-                Pokemon.Height = json.Height;
-                Pokemon.Weight = json.Weight;
-                Pokemon.Types = json.Types;
-
-                for (int i = 0; i < json.Types.Length; i++)
-                {
-                    var res = Traduccion(Pokemon.Types[i].Type.Name, "");
-                    Button btn = new Button
-                    {
-                        Text = res,
-                        IsEnabled = true,
-                        CornerRadius = 50,
-                        BackgroundColor = ColorTipo(Pokemon.Types[i].Type.Name),
-                        TextColor = Color.FromRgb(13, 13, 12),
-                        BorderColor = Color.Black,
-                    };
-                    gridtipo.ColumnDefinitions.Add(new ColumnDefinition());
-                    gridtipo.Children.Add(btn, i, 0);
-
-                }
-                for (int i = 0; i < json.Abilities.Length; i++)
-                {
-                    Button btn = new Button
-                    {
-                        Text = json.Abilities[i].AbilityAbility.Name,
-                        CornerRadius = 20,
-                        BorderColor = Color.Black,
-                        CommandParameter = json.Abilities[i].AbilityAbility.Url,
-                    };
-                    if (json.Abilities[i].IsHidden)
-                    {
-                        btn.Text = btn.Text + " (Oculta)";
-                    }
-
-                    btn.Clicked += HandlerComun;
-
-                    grHability.RowDefinitions.Add(new RowDefinition());
-                    grHability.Children.Add(btn, 0, i + 1);
-                }
-
-                if (Pokemon.Weight > 10)
-                {
-                    lblWeight.Text = Pokemon.Weight.ToString().Insert(Pokemon.Weight.ToString().Count() - 1, ",") + " Kg.";
-                }
-                else
-                {
-                    lblWeight.Text = Pokemon.Weight.ToString() + "00 Gr";
-                }
-                lblHeight.Text = Pokemon.Height.ToString() + "0 cm.";
-                lblName.Text = Pokemon.Name.ToUpper();
-                ImgPoke.Source = Pokemon.UrlImg;
-                Order = json.Id;
-
-
-            }
-
-
-
-
-
 
             //GetEvoChain
             EvoModel evoModel = new EvoModel();
@@ -153,78 +140,46 @@ namespace PokedexV3.Vistas
 
                 evoModel.Chain = json.Chain;
 
-                txtPE.Text = evoModel.Chain.Species.Name;
-                ImgPE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.Species.Name + ".png";
-                ImgPE.CommandParameter = evoModel.Chain.Species.Url;
+                txtNor.Text = evoModel.Chain.Species.Name;
+                ImgNor.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.Species.Name + ".png";
+                frNorm.BackgroundColor = Contenido.BackgroundColor;
+                ImgNor.BackgroundColor = Contenido.BackgroundColor;
 
+                txtPPE.Text = evoModel.Chain.EvolvesTo[0].Species.Name;
+                ImgPPE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[0].Species.Name + ".png";
+                ImgPPE.CommandParameter = evoModel.Chain.EvolvesTo[0].Species.Url;
 
-                if (evoModel.Chain.EvolvesTo.Length != 0)
-                {
-                    if (Pokemon.Name == evoModel.Chain.Species.Name)
-                    {
-                        frPE.BackgroundColor = Contenido.BackgroundColor;
-                        ImgPE.BackgroundColor = Contenido.BackgroundColor;
-                    }
+                txtSPE.Text = evoModel.Chain.EvolvesTo[1].Species.Name;
+                ImgSPE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[1].Species.Name + ".png";
+                ImgSPE.CommandParameter = evoModel.Chain.EvolvesTo[1].Species.Url;
 
-                    if (evoModel.Chain.Species.Name == "eevee")
-                    {
-                        for (int i = 0; i < evoModel.Chain.EvolvesTo.Length; i++)
-                        {
-                            if (evoModel.Chain.EvolvesTo[i].Species.Name == Pokemon.Name)
-                            {
-                                frSE.BackgroundColor = Contenido.BackgroundColor;
-                                ImgSE.BackgroundColor = Contenido.BackgroundColor;
-                                txtSE.Text = evoModel.Chain.EvolvesTo[i].Species.Name;
-                                ImgSE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[i].Species.Name + ".png";
-                                ImgSE.CommandParameter = evoModel.Chain.EvolvesTo[i].Species.Url;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (Pokemon.Name == evoModel.Chain.EvolvesTo[0].Species.Name)
-                        {
-                            frSE.BackgroundColor = Contenido.BackgroundColor;
-                            ImgSE.BackgroundColor = Contenido.BackgroundColor;
-                        }
-                        txtSE.Text = evoModel.Chain.EvolvesTo[0].Species.Name;
-                        ImgSE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[0].Species.Name + ".png";
-                        ImgSE.CommandParameter = evoModel.Chain.EvolvesTo[0].Species.Url;
-                    }
+                txtTPE.Text = evoModel.Chain.EvolvesTo[2].Species.Name;
+                ImgTPE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[2].Species.Name+ ".png";
+                ImgTPE.CommandParameter = evoModel.Chain.EvolvesTo[2].Species.Url;
 
-                    if (evoModel.Chain.EvolvesTo[0].EvolvesTo.Length != 0)
-                    {
-                        if (Pokemon.Name == evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name)
-                        {
-                            frTE.BackgroundColor = Contenido.BackgroundColor;
-                            ImgTE.BackgroundColor = Contenido.BackgroundColor;
-                        }
-                        txtTE.Text = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name;
-                        ImgTE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name + ".png";
-                        ImgTE.CommandParameter = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Url;
+                txtCPE.Text = evoModel.Chain.EvolvesTo[3].Species.Name;
+                ImgCPE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[3].Species.Name + ".png";
+                ImgCPE.CommandParameter = evoModel.Chain.EvolvesTo[3].Species.Url;
 
-                    }
-                    else
-                    {
-                        frTE.IsVisible = false;
-                        txtTE.Text = "";
-                        lblT2.Text = "";
-                    }
-                }
-                else
-                {
-                    txtSE.Text = "";
-                    txtTE.Text = "";
-                    lblT1.Text = "";
-                    lblT2.Text = "";
-                    frSE.IsVisible = false;
-                    frTE.IsVisible = false;
-                }
+                txtQPE.Text = evoModel.Chain.EvolvesTo[4].Species.Name;
+                ImgQPE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[4].Species.Name + ".png";
+                ImgQPE.CommandParameter = evoModel.Chain.EvolvesTo[4].Species.Url;
+
+                txtSePE.Text = evoModel.Chain.EvolvesTo[5].Species.Name;
+                ImgSePE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[5].Species.Name + ".png";
+                ImgSePE.CommandParameter = evoModel.Chain.EvolvesTo[5].Species.Url;
+
+                txtSepPE.Text = evoModel.Chain.EvolvesTo[6].Species.Name;
+                ImgSepPE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[6].Species.Name + ".png";
+                ImgSepPE.CommandParameter = evoModel.Chain.EvolvesTo[6].Species.Url;
+
+                txtOPE.Text = evoModel.Chain.EvolvesTo[7].Species.Name;
+                ImgOPE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[7].Species.Name + ".png";
+                ImgOPE.CommandParameter = evoModel.Chain.EvolvesTo[7].Species.Url;
 
             }
             return true;
         }
-
         public async Task<string> InfoHability(string url)
         {
             HttpClient http = new HttpClient();
@@ -414,36 +369,44 @@ namespace PokedexV3.Vistas
             return resultado;
         }
 
-        private async void ImgPE_Clicked(object sender, EventArgs e)
+        private async void ImgPPE_Clicked(object sender, EventArgs e)
         {
-            if (frPE.BackgroundColor == Color.Gray)
-            {
-                if (txtPE.Text == "eevee")
-                {
-                    await Navigation.PushAsync(new VistaEevee(txtPE.Text));
-                }
-                else
-                {
-                    await Navigation.PushAsync(new VistaPokemon(txtPE.Text, ImgPE.CommandParameter.ToString()));
-                }
-            }
+            await Navigation.PushAsync(new VistaPokemon(txtPPE.Text, ImgPPE.CommandParameter.ToString()));
         }
 
-        private async void ImgSE_Clicked(object sender, EventArgs e)
+        private async void ImgSPE_Clicked(object sender, EventArgs e)
         {
-            if (frSE.BackgroundColor == Color.Gray)
-            {
-
-                await Navigation.PushAsync(new VistaPokemon(txtSE.Text, ImgSE.CommandParameter.ToString()));
-            }
+            await Navigation.PushAsync(new VistaPokemon(txtSPE.Text,ImgSPE.CommandParameter.ToString()));
         }
 
-        private async void ImgTE_Clicked(object sender, EventArgs e)
+        private async void ImgTPE_Clicked(object sender, EventArgs e)
         {
-            if (frTE.BackgroundColor == Color.Gray)
-            {
-                await Navigation.PushAsync(new VistaPokemon(txtTE.Text, ImgTE.CommandParameter.ToString()));
-            }
+            await Navigation.PushAsync(new VistaPokemon(txtTPE.Text, ImgTPE.CommandParameter.ToString()));
+        }
+
+        private async void ImgCPE_Clicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new VistaPokemon(txtCPE.Text, ImgCPE.CommandParameter.ToString()));
+        }
+
+        private async void ImgQPE_Clicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new VistaPokemon(txtQPE.Text, ImgQPE.CommandParameter.ToString()));
+        }
+
+        private async void ImgSePE_Clicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new VistaPokemon(txtSePE.Text, ImgSePE.CommandParameter.ToString()));
+        }
+
+        private async void ImgSepPE_Clicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new VistaPokemon(txtSepPE.Text, ImgSepPE.CommandParameter.ToString()));
+        }
+
+        private async void ImgOPE_Clicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new VistaPokemon(txtOPE.Text, ImgOPE.CommandParameter.ToString()));
         }
         private async void HandlerComun(object sender, EventArgs e)
         {
@@ -453,6 +416,6 @@ namespace PokedexV3.Vistas
 
             await DisplayAlert(habilidad, texto, "Cerrar");
         }
-
     }
+
 }

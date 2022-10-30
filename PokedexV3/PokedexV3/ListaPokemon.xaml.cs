@@ -37,7 +37,7 @@ namespace PokedexV3
                 Order = ToolbarItemOrder.Secondary
             };
             URL = "https://pokeapi.co/api/v2/pokedex/1";
-            UrlDesc = "https://pokeapi.co/api/v2/pokemon-species/";  
+            UrlDesc = "https://pokeapi.co/api/v2/pokemon-species/";
             _ = GetPokemon(URL);
             BackgroundColor = Color.Black;
         }
@@ -59,8 +59,8 @@ namespace PokedexV3
                         Url = poke.PokemonSpecies.Url,
                         UrlImg = "https://img.pokemondb.net/sprites/home/normal/" + poke.PokemonSpecies.Name + ".png"
                     };
-                    listaPokemon.Add(listModel);                   
-                    
+                    listaPokemon.Add(listModel);
+
                 }
                 ListPoke.ItemsSource = null;
                 ListPoke.ItemsSource = listaPokemon;
@@ -111,7 +111,7 @@ namespace PokedexV3
             {
                 ListPoke.ItemsSource = listaPokemon;
             }
-            
+
 
         }
         private async void ListPoke_ItemTapped(object sender, ItemTappedEventArgs e)
@@ -122,12 +122,29 @@ namespace PokedexV3
                 ToolbarItems[0].IconImageSource = "SearchIcon.png";
             }
             var tappedItem = e.Item as PokeImgModel;
-            string x = tappedItem.Name;
-            await Navigation.PushAsync(new VistaPokemon(x));
+            var x = tappedItem.Url.ToString();
+            var y = tappedItem.Name.ToString();
+            if (x == "https://pokeapi.co/api/v2/pokemon-species/133/")
+            {
+                await Navigation.PushAsync(new VistaEevee(y));
+            }
+            else
+            {
+                await Navigation.PushAsync(new VistaPokemon(y,x));
+            }
         }
         private async void ToolbarItem_Clicked(object sender, EventArgs e)
         {
-            string res = await DisplayActionSheet("Filtrar por Generacion", "Cerrar", null, "Todos", "Generacion 1", "Generacion 2", "Generacion 3", "Generacion 4", "Generacion 5", "Generacion 6", "Generacion 7", "Generacion 8");
+            string res = await DisplayActionSheet("Filtrar por Generacion", "Cerrar", null,
+                "Todos - Nacional",
+                "Generacion 1 - Región Kanto",
+                "Generacion 2 - Región Jhoto",
+                "Generacion 3 - Región Hoenn",
+                "Generacion 4 - Región Sinnoh",
+                "Generacion 5 - Región Unova",
+                "Generacion 6 - Región Kalos",
+                "Generacion 7 - Región Alola",
+                "Generacion 8 - Región Galar");
             TraerGeneracion(res);
         }
         private void Mostrarbarra()
@@ -153,39 +170,39 @@ namespace PokedexV3
         {
             switch (res)
             {
-                case "Todos":
+                case "Todos - Nacional":
                     await GetPokemon(URL);
                     this.Title = "Lista Pokémon - Nacional";
                     break;
-                case "Generacion 1":
+                case "Generacion 1 - Región Kanto":
                     await GetGenPokemon("https://pokeapi.co/api/v2/generation/1");
                     this.Title = "Generacion 1 - Región Kanto";
                     break;
-                case "Generacion 2":
+                case "Generacion 2 - Región Jhoto":
                     await GetGenPokemon("https://pokeapi.co/api/v2/generation/2");
                     this.Title = "Generacion 2 - Región Jhoto";
                     break;
-                case "Generacion 3":
+                case "Generacion 3 - Región Hoenn":
                     await GetGenPokemon("https://pokeapi.co/api/v2/generation/3");
                     this.Title = "Generacion 3 - Región Hoenn";
                     break;
-                case "Generacion 4":
+                case "Generacion 4 - Región Sinnoh":
                     await GetGenPokemon("https://pokeapi.co/api/v2/generation/4");
                     this.Title = "Generacion 4 - Región Sinnoh";
                     break;
-                case "Generacion 5":
+                case "Generacion 5 - Región Unova":
                     await GetGenPokemon("https://pokeapi.co/api/v2/generation/5");
                     this.Title = "Generacion 5 - Región Unova";
                     break;
-                case "Generacion 6":
+                case "Generacion 6 - Región Kalos":
                     await GetGenPokemon("https://pokeapi.co/api/v2/generation/6");
                     this.Title = "Generacion 6 - Región Kalos";
                     break;
-                case "Generacion 7":
+                case "Generacion 7 - Región Alola":
                     await GetGenPokemon("https://pokeapi.co/api/v2/generation/7");
                     this.Title = "Generacion 7 - Región Alola";
                     break;
-                case "Generacion 8":
+                case "Generacion 8 - Región Galar":
                     await GetGenPokemon("https://pokeapi.co/api/v2/generation/8");
                     this.Title = "Generacion 8 - Región Galar";
                     break;

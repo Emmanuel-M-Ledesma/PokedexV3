@@ -1,9 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="PokedexV3.Vistas.VistaPokemon"
-             Title="Detalles del pokémon"
-             >
+             x:Class="PokedexV3.Vistas.VistaEevee"
+             Title="Detalles del pokémon">
 
     <ContentPage.Content>
         <ScrollView FlowDirection="LeftToRight">
@@ -213,6 +212,10 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="auto"/>
                                 <RowDefinition Height="130"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="130"/>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="130"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -241,23 +244,71 @@
                               Margin="-10" 
                               StrokeThickness="2">
                             </Line>
-                            <Label Text="→" Grid.Row="1" Grid.Column="1" VerticalTextAlignment="Center" FontSize="25" x:Name="lblT1"></Label>
-                            <Label Text="→" Grid.Row="1" Grid.Column="3" VerticalTextAlignment="Center" FontSize="25" x:Name="lblT2"></Label>
-                            <Frame x:Name="frPE" Grid.Column="0" Grid.Row="1" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="Gray">
-                                <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgPE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgPE_Clicked" CommandParameter=""/>
+                            
+                            <Frame x:Name="frPPE" Grid.Row="1" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="Gray">
+                                <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgPPE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgPPE_Clicked"/>
                             </Frame>
-                            <Label Text="Vacio" MaxLines="1" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="1" Grid.Column="0" Grid.RowSpan="1" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" x:Name="txtPE" TranslationY="-10"/>
+                            <Label Text="Vacio" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="1" Grid.Column="0" Grid.RowSpan="1" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" x:Name="txtPPE" TranslationY="-10"/>
 
-                            <Frame x:Name="frSE" Grid.Column="2" Grid.Row="1" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="Gray">
-                                <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgSE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgSE_Clicked"/>
+                            <Frame x:Name="frSPE" Grid.Column="2" Grid.Row="1" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="Gray">
+                                <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgSPE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgSPE_Clicked"/>
                             </Frame>
-                            <Label Text="Vacio" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="1" Grid.Column="2" Grid.RowSpan="1" x:Name="txtSE" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" TranslationY="-10"/>
+                            <Label Text="Vacio" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="1" Grid.Column="2" Grid.RowSpan="1" x:Name="txtSPE" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" TranslationY="-10"/>
 
-
-                            <Frame x:Name="frTE" Grid.Column="4" Grid.Row="1" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="Gray">
-                                <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgTE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgTE_Clicked"/>
+                            <Frame x:Name="frTPE" Grid.Column="4" Grid.Row="1" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="Gray">
+                                <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgTPE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgTPE_Clicked"/>
                             </Frame>
-                            <Label Text="Vacio" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="1" Grid.Column="4" Grid.RowSpan="1" x:Name="txtTE" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" TranslationY="-10"/>
+                            <Label Text="Vacio" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="1" Grid.Column="4" Grid.RowSpan="1" x:Name="txtTPE" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" TranslationY="-10"/>
+                                <!---Fila 2 -->
+
+                            <Label Text="⬉" Grid.Row="2" Grid.Column="1" VerticalTextAlignment="Center" FontSize="25" ></Label>
+                            <Label Text="↑" Grid.Row="2" Grid.Column="2" VerticalTextAlignment="Center" HorizontalOptions="Center" FontSize="25" ></Label>
+                            <Label Text="⬈" Grid.Row="2" Grid.Column="3" VerticalTextAlignment="Center" FontSize="25" ></Label>
+                               
+                                <!---Fila 3 -->
+
+                            <Label Text="←" Grid.Row="3" Grid.Column="1" VerticalTextAlignment="Center"  FontSize="25" ></Label>
+                            <Label Text="→" Grid.Row="3" Grid.Column="3" VerticalTextAlignment="Center" FontSize="25" ></Label>
+
+
+
+
+                            <Frame x:Name="frCPE" Grid.Column="0" Grid.Row="3" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="Gray">
+                                <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgCPE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgCPE_Clicked"/>
+                            </Frame>
+                            <Label Text="Vacio" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="3" Grid.Column="0" Grid.RowSpan="1" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" x:Name="txtCPE" TranslationY="-10"/>
+
+                            <Frame x:Name="frNorm" Grid.Column="2" Grid.Row="3" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="gray">
+                                <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgNor" HorizontalOptions="FillAndExpand" VerticalOptions="Start"/>
+                            </Frame>
+                            <Label Text="Vacio" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="3" Grid.Column="2" Grid.RowSpan="1" x:Name="txtNor" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" TranslationY="-10"/>
+
+
+                            <Frame x:Name="frQPE" Grid.Column="4" Grid.Row="3" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="Gray">
+                                <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgQPE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgQPE_Clicked"/>
+                            </Frame>
+                            <Label Text="Vacio" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="3" Grid.Column="4" Grid.RowSpan="1" x:Name="txtQPE" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" TranslationY="-10"/>
+                                <!---Fila 4 -->
+                            <Label Text="⬋" Grid.Row="4" Grid.Column="1" VerticalTextAlignment="Center" FontSize="25" ></Label>
+                            <Label Text="↓" Grid.Row="4" Grid.Column="2" VerticalTextAlignment="Center" HorizontalOptions="Center" FontSize="25" ></Label>
+                            <Label Text="⬊" Grid.Row="4" Grid.Column="3" VerticalTextAlignment="Center" FontSize="25" ></Label>
+
+                            <!---Fila 5 -->
+                            <Frame x:Name="frSePE" Grid.Column="0" Grid.Row="5" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="Gray">
+                                <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgSePE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgSePE_Clicked" />
+                            </Frame>
+                            <Label Text="Vacio" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="5" Grid.Column="0" Grid.RowSpan="1" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" x:Name="txtSePE" TranslationY="-10"/>
+
+                            <Frame x:Name="frSepPE" Grid.Column="2" Grid.Row="5" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="Gray">
+                                <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgSepPE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgSepPE_Clicked"/>
+                            </Frame>
+                            <Label Text="Vacio" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="5" Grid.Column="2" Grid.RowSpan="1" x:Name="txtSepPE" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" TranslationY="-10"/>
+
+
+                            <Frame x:Name="frOPE" Grid.Column="4" Grid.Row="5" CornerRadius="20" Grid.RowSpan="1" BackgroundColor="Gray">
+                                <ImageButton Source="{Binding UrlImg}" BackgroundColor="Gray" x:Name="ImgOPE" HorizontalOptions="FillAndExpand" VerticalOptions="Start" Clicked="ImgOPE_Clicked"/>
+                            </Frame>
+                            <Label Text="Vacio" FontFamily="PokeFont.ttf" FontSize="20" Grid.Row="5" Grid.Column="4" Grid.RowSpan="1" x:Name="txtOPE" HorizontalOptions="Center" VerticalOptions="End" TextTransform="Uppercase" TranslationY="-10"/>
 
                         </Grid>
                     </Frame>
