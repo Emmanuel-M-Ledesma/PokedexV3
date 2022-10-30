@@ -116,11 +116,7 @@ namespace PokedexV3
         }
         private async void ListPoke_ItemTapped(object sender, ItemTappedEventArgs e)
         {
-            if (Buscar.IsVisible)
-            {
-                Buscar.IsVisible = false;
-                ToolbarItems[0].IconImageSource = "SearchIcon.png";
-            }
+            
             var tappedItem = e.Item as PokeImgModel;
             var x = tappedItem.Url.ToString();
             var y = tappedItem.Name.ToString();

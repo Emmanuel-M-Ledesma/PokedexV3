@@ -68,11 +68,10 @@ namespace PokedexV3.Vistas
                     lblDesc.FontSize = 15;
                 }
 
-                //BackgroundColor = BGColor(PokeDetail.Color.Name);
                 Contenido.BackgroundColor = BGColor(PokeDetail.Color.Name);
             }
 
-            string Gpk = URL + PokeDetail.Order;
+            string Gpk = URL + PokeDetail.Id;
             InfoImgModel Pokemon = new InfoImgModel();
             resp = await http.GetAsync(Gpk);
             if (resp.IsSuccessStatusCode)
@@ -258,6 +257,8 @@ namespace PokedexV3.Vistas
                         frTE.IsVisible = false;
                         txtTE.Text = "";
                         lblT2.Text = "";
+                        grEvolution.Children.Remove(frTPE);
+                        grEvolution.Children.Remove(txtTPE);
                     }
                 }
                 else
@@ -268,6 +269,8 @@ namespace PokedexV3.Vistas
                     lblT2.Text = "";
                     frSE.IsVisible = false;
                     frTE.IsVisible = false;
+                    grEvolution.Children.Remove(frTPE);
+                    grEvolution.Children.Remove(txtTPE);
                 }
 
             }
