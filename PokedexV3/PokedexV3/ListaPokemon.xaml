@@ -63,7 +63,7 @@
                                                ScaleX="1"
                                                Grid.RowSpan="3"
                                                BackgroundColor="Gray"></Frame>
-
+                                        
                                         <Image Source="{Binding UrlImg}"  
                                                x:Name="ImgPk"
                                                HeightRequest="200"

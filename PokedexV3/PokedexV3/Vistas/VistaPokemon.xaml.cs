@@ -22,7 +22,6 @@ namespace PokedexV3.Vistas
         public string UrlDesc;
         public string UrlEvo;
         private string flavor;
-        private long Order;
 
         public VistaPokemon(string Nombre, string url)
         {
@@ -133,8 +132,6 @@ namespace PokedexV3.Vistas
                 lblHeight.Text = Pokemon.Height.ToString() + "0 cm.";
                 lblName.Text = Pokemon.Name.ToUpper();
                 ImgPoke.Source = Pokemon.UrlImg;
-                Order = json.Id;
-
 
             }
 
