@@ -25,9 +25,6 @@ namespace PokedexV3.Models
         [JsonProperty("flavor_text_entries")]
         public FlavorTextEntry[] FlavorTextEntries { get; set; }
 
-        //[JsonProperty("genera")]
-        //public Genus[] Genera { get; set; }
-
         [JsonProperty("generation")]
         public Color Generation { get; set; }
 
@@ -54,8 +51,5 @@ namespace PokedexV3.Models
 
         [JsonProperty("shape")]
         public Color Shape { get; set; }
-
-        //[JsonProperty("varieties")]
-        //public Variety[] Varieties { get; set; }
     }
 }

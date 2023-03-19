@@ -9,6 +9,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
+using System.Runtime.Serialization;
+using Acr.UserDialogs;
+using System.ComponentModel.Design;
+using PokedexV3.Resources;
 
 namespace PokedexV3.Vistas
 {
@@ -17,258 +21,334 @@ namespace PokedexV3.Vistas
     {
         public string URL;
         public string UrlDesc;
-        public VistaPokemon(string data)
+        public string UrlEvo;
+        private string flavor;
+
+        public VistaPokemon(string Nombre, string url)
         {
             InitializeComponent();
-            URL = "https://pokeapi.co/api/v2/pokemon/" + data.ToLower();
-            UrlDesc = "https://pokeapi.co/api/v2/pokemon-species/";
-            _ = GetInfo(URL);
-            var navigationPage = new NavigationPage();
+            URL = "https://pokeapi.co/api/v2/pokemon/";
+            UrlDesc = url.ToLower();
+            UrlEvo = "https://pokeapi.co/api/v2/evolution-chain/";
+
+            LoadComponents().ContinueWith(task =>
+            {
+                if (task.IsCompleted && !task.IsFaulted && !task.IsCanceled)
+                {
+                    Device.BeginInvokeOnMainThread(() => { this.IsVisible = true; });
+                }
+            });
         }
+        private async Task LoadComponents()
+        {
+            await GetInfo(URL);
+            GridContenido.IsVisible = false;
+            GridContenido.IsVisible = true;
+        }
+
         public async Task<bool> GetInfo(string Url)
         {
+            //GetFlavor
+            Enums Enumeraciones = new Enums();
             HttpClient http = new HttpClient();
+            DetalleModel PokeDetail = new DetalleModel();
+            HttpResponseMessage resp = await http.GetAsync(UrlDesc);
+            if (resp.IsSuccessStatusCode)
+            {
+                string respString = await resp.Content.ReadAsStringAsync();
+                var json = JsonConvert.DeserializeObject<DetalleModel>(respString);
+                PokeDetail = json;
+                UrlEvo = json.EvolutionChain.Url.ToString();
+
+
+                PokeDetail.FlavorTextEntries = json.FlavorTextEntries;
+
+
+                var desc = PokeDetail.FlavorTextEntries
+                .FirstOrDefault(x => x.Language.Name == "es")
+                ?.FlavorText.Replace("\n", " ");
+
+                if (!string.IsNullOrWhiteSpace(desc))
+                {
+                    lblDesc.Text = desc;
+                    lblDesc.FontSize = 15;
+                }
+                else
+                {
+                    lblDesc.Text = PokeDetail.FlavorTextEntries[0].FlavorText.Replace("\n", " ");
+
+                    lblDesc.FontSize = 15;
+                }
+
+                Contenido.BackgroundColor = Enumeraciones.BGColor(PokeDetail.Color.Name);
+            }
+
+            string Gpk = URL + PokeDetail.Id;
             InfoImgModel Pokemon = new InfoImgModel();
-            var resp = await http.GetAsync(URL);
+            resp = await http.GetAsync(Gpk);
             if (resp.IsSuccessStatusCode)
             {
                 var respString = await resp.Content.ReadAsStringAsync();
                 var json = JsonConvert.DeserializeObject<InfoPoke>(respString);
 
 
-                Pokemon.UrlImg = "https://img.pokemondb.net/sprites/home/normal/" + json.Name + ".png";
-                Pokemon.Name = json.Name;
+                Pokemon.UrlImg = "https://img.pokemondb.net/sprites/home/normal/" + PokeDetail.Name + ".png";
+                Pokemon.Name = PokeDetail.Name;
                 Pokemon.Height = json.Height;
                 Pokemon.Weight = json.Weight;
                 Pokemon.Types = json.Types;
 
                 for (int i = 0; i < json.Types.Length; i++)
                 {
-                    var res = Traduccion(Pokemon.Types[i].Type.Name, "");
+                    var res = Enumeraciones.Tipos(json.Types[i].Type.Name);
                     Button btn = new Button
                     {
                         Text = res,
                         IsEnabled = true,
                         CornerRadius = 50,
-                        BackgroundColor = ColorTipo(Pokemon.Types[i].Type.Name),
+                        BackgroundColor = Enumeraciones.ColorTipo(Pokemon.Types[i].Type.Name),
                         TextColor = Color.FromRgb(13, 13, 12),
                         BorderColor = Color.Black,
                     };
-
-
                     gridtipo.ColumnDefinitions.Add(new ColumnDefinition());
                     gridtipo.Children.Add(btn, i, 0);
-                    
+
+                }
+                for (int i = 0; i < json.Abilities.Length; i++)
+                {
+                    Button btn = new Button
+                    {
+                        Text = json.Abilities[i].AbilityAbility.Name,
+                        CornerRadius = 20,
+                        BorderColor = Color.Black,
+                        CommandParameter = json.Abilities[i].AbilityAbility.Url,
+                    };
+                    if (json.Abilities[i].IsHidden)
+                    {
+                        btn.Text = btn.Text + " (Oculta)";
+                    }
+
+                    btn.Clicked += HandlerComun;
+
+                    grHability.RowDefinitions.Add(new RowDefinition());
+                    grHability.Children.Add(btn, 0, i + 1);
                 }
 
-                lblWeight.Text = Pokemon.Weight.ToString().Insert(Pokemon.Weight.ToString().Count() - 1, ",");
-                lblHeight.Text = Pokemon.Height.ToString() + "0";
+                if (Pokemon.Weight > 10)
+                {
+                    lblWeight.Text = Pokemon.Weight.ToString().Insert(Pokemon.Weight.ToString().Count() - 1, ",") + " Kg.";
+                }
+                else
+                {
+                    lblWeight.Text = Pokemon.Weight.ToString() + "00 Gr";
+                }
+                lblHeight.Text = Pokemon.Height.ToString() + "0 cm.";
                 lblName.Text = Pokemon.Name.ToUpper();
                 ImgPoke.Source = Pokemon.UrlImg;
-                _ = GetFlavor(json.Id);
 
             }
-            return true;
-        }
 
-        public async Task<bool> GetFlavor(long order)
-        {
-            var Detalle = UrlDesc + order;
-            HttpClient http = new HttpClient();
-            DetalleModel PokeDetail = new DetalleModel();
-            var resp = await http.GetAsync(Detalle);
+
+            //GetEvoChain
+            EvoModel evoModel = new EvoModel();
+            resp = await http.GetAsync(UrlEvo);
             if (resp.IsSuccessStatusCode)
             {
                 var respString = await resp.Content.ReadAsStringAsync();
-                var json = JsonConvert.DeserializeObject<DetalleModel>(respString);
+                var json = JsonConvert.DeserializeObject<EvoModel>(respString);
 
-                PokeDetail.FlavorTextEntries = json.FlavorTextEntries;
-                for (int i = 0; i < PokeDetail.FlavorTextEntries.Length; i++)
+                evoModel.Chain = json.Chain;
+
+                txtPE.Text = evoModel.Chain.Species.Name;
+                ImgPE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.Species.Name + ".png";
+                ImgPE.CommandParameter = evoModel.Chain.Species.Url;
+
+
+                if (evoModel.Chain.EvolvesTo.Length != 0)
                 {
-                    if (PokeDetail.FlavorTextEntries[i].Language.Name == "es")
+                    if (Pokemon.Name == evoModel.Chain.Species.Name)
                     {
-                        lblDesc.Text = PokeDetail.FlavorTextEntries[i].FlavorText.Replace("\n", " ");
-                        i = PokeDetail.FlavorTextEntries.Length;
+                        frPE.BackgroundColor = Contenido.BackgroundColor;
+                        ImgPE.BackgroundColor = Contenido.BackgroundColor;
+                    }
+
+                    if (evoModel.Chain.Species.Name == "eevee")
+                    {
+                        for (int i = 0; i < evoModel.Chain.EvolvesTo.Length; i++)
+                        {
+                            if (evoModel.Chain.EvolvesTo[i].Species.Name == Pokemon.Name)
+                            {
+                                frSE.BackgroundColor = Contenido.BackgroundColor;
+                                ImgSE.BackgroundColor = Contenido.BackgroundColor;
+                                txtSE.Text = evoModel.Chain.EvolvesTo[i].Species.Name;
+                                ImgSE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[i].Species.Name + ".png";
+                                ImgSE.CommandParameter = evoModel.Chain.EvolvesTo[i].Species.Url;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (Pokemon.Name == evoModel.Chain.EvolvesTo[0].Species.Name)
+                        {
+                            frSE.BackgroundColor = Contenido.BackgroundColor;
+                            ImgSE.BackgroundColor = Contenido.BackgroundColor;
+                        }
+                        txtSE.Text = evoModel.Chain.EvolvesTo[0].Species.Name;
+                        ImgSE.Source = "https://img.pokemondb.net/sprites/home/normal/" + evoModel.Chain.EvolvesTo[0].Species.Name + ".png";
+                        ImgSE.CommandParameter = evoModel.Chain.EvolvesTo[0].Species.Url;
+                    }
+
+                    if (evoModel.Chain.EvolvesTo[0].EvolvesTo.Length != 0)
+                    {
+                        string url = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Url.ToString();
+                        string nombre = evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name;
+                        string url2 = "", nombre2 = "", nombre3;
+                        if (evoModel.Chain.EvolvesTo[0].EvolvesTo.Length > 1)
+                        {
+                            lblTP2.IsVisible = true;
+                            for (int i = 0; i < evoModel.Chain.EvolvesTo[0].EvolvesTo.Length; i++)
+                            {
+                                nombre3 = "vacio";
+                                if (evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Name == Pokemon.Name)
+                                {
+
+                                    frTE.BackgroundColor = Contenido.BackgroundColor;
+                                    ImgTE.BackgroundColor = Contenido.BackgroundColor;
+                                    nombre = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Name;
+                                    nombre3 = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Name;
+                                    url = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Url.ToString();
+                                    grEvolution.Children.Remove(frTPE);
+                                    grEvolution.Children.Remove(txtTPE);
+                                    grEvolution.Children.Remove(lblTP2);
+
+                                }
+                                if (i == 0 && nombre3 == "vacio")
+                                {
+                                    nombre = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Name;
+                                    url = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Url.ToString();
+
+                                }
+                                if (i == 1 && nombre3 == "vacio")
+                                {
+                                    nombre2 = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Name;
+                                    url2 = evoModel.Chain.EvolvesTo[0].EvolvesTo[i].Species.Url.ToString();
+
+                                }
+
+                            }
+                        }
+                        else if (Pokemon.Name == evoModel.Chain.EvolvesTo[0].EvolvesTo[0].Species.Name)
+                        {
+                            frTE.BackgroundColor = Contenido.BackgroundColor;
+                            ImgTE.BackgroundColor = Contenido.BackgroundColor;
+                        }
+                        if (nombre2 != "" && url2 != "")
+                        {
+                            txtTPE.Text = nombre2;
+                            ImgTPE.Source = "https://img.pokemondb.net/sprites/home/normal/" + nombre2 + ".png";
+                            ImgTPE.CommandParameter = url2;
+                        }
+                        else
+                        {
+                            grEvolution.Children.Remove(frTPE);
+                            grEvolution.Children.Remove(txtTPE);
+                        }
+                        txtTE.Text = nombre;
+                        ImgTE.Source = "https://img.pokemondb.net/sprites/home/normal/" + nombre + ".png";
+                        ImgTE.CommandParameter = url;
+
+                    }
+                    else
+                    {
+                        frTE.IsVisible = false;
+                        txtTE.Text = string.Empty;
+                        lblT2.Text = string.Empty;
+                        grEvolution.Children.Remove(frTPE);
+                        grEvolution.Children.Remove(txtTPE);
                     }
                 }
+                else
+                {
+                    txtSE.Text = string.Empty;
+                    txtTE.Text = string.Empty;
+                    lblT1.Text = string.Empty;
+                    lblT2.Text = string.Empty;
+                    frSE.IsVisible = false;
+                    frTE.IsVisible = false;
+                    grEvolution.Children.Remove(frTPE);
+                    grEvolution.Children.Remove(txtTPE);
+                }
 
-                PokeDetail = json;
-
-                this.BackgroundColor = BGColor(PokeDetail.Color.Name);
-
-
-                //lblDesc.Text = PokeDetail.FlavorTextEntries[1].FlavorText.Replace("\n"," ");
             }
-
             return true;
         }
-        public string Traduccion(string tipo, string resultado)
+
+        public async Task<string> InfoHability(string url)
         {
-
-            switch (tipo)
+            HttpClient http = new HttpClient();
+            var respuesta = await http.GetAsync(url);
+            if (respuesta.IsSuccessStatusCode)
             {
-                case "bug":
-                    resultado = "INSECTO";
-                    break;
-                case "dark":
-                    resultado = "Oscuro";
-                    break;
-                case "dragon":
-                    resultado = "dragon";
-                    break;
-                case "electric":
-                    resultado = "electrico";
-                    break;
-                case "fairy":
-                    resultado = "Hada";
-                    break;
-                case "fighting":
-                    resultado = "Pelea";
-                    break;
-                case "fire":
-                    resultado = "Fuego";
-                    break;
-                case "flying":
-                    resultado = "Volador";
-                    break;
-                case "ghost":
-                    resultado = "Fantasma";
-                    break;
-                case "grass":
-                    resultado = "pasto";
-                    break;
-                case "ground":
-                    resultado = "Tierra";
-                    break;
-                case "ice":
-                    resultado = "Hielo";
-                    break;
-                case "normal":
-                    resultado = "normal";
-                    break;
-                case "poison":
-                    resultado = "Veneno";
-                    break;
-                case "psychic":
-                    resultado = "Psiquico";
-                    break;
-                case "rock":
-                    resultado = "Roca";
-                    break;
-                case "steel":
-                    resultado = "Acero";
-                    break;
-                case "water":
-                    resultado = "Agua";
-                    break;
+                var respString = await respuesta.Content.ReadAsStringAsync();
+                var json = JsonConvert.DeserializeObject<AbilityModel>(respString);
 
+                for (int i = 0; i < json.FlavorTextEntries.Length; i++)
+                {
+                    if (json.FlavorTextEntries[i].Language.Name == "es")
+                    {
+                        flavor = json.FlavorTextEntries[i].FlavorText.Replace("\n", " ");
+                    }
+                }
             }
-            return resultado;
+
+            return flavor;
         }
 
-        public Color ColorTipo(string color)
+        private async void ImgPE_Clicked(object sender, EventArgs e)
         {
-            Color resultado = new Color();
-            switch (color)
+            if (frPE.BackgroundColor == Color.Gray)
             {
-                case "bug":
-                    resultado = Color.FromRgb(26, 153, 79);
-                    break;
-                case "dark":
-                    resultado = Color.FromRgb(89, 90, 121);
-                    break;
-                case "dragon":
-                    resultado = Color.FromRgb(42, 203, 218);
-                    break;
-                case "electric":
-                    resultado = Color.FromRgb(249, 249, 117);
-                    break;
-                case "fairy":
-                    resultado = Color.FromRgb(251, 26, 105);
-                    break;
-                case "fighting":
-                    resultado = Color.FromRgb(251, 99, 57);
-                    break;
-                case "fire":
-                    resultado = Color.FromRgb(251, 77, 91);
-                    break;
-                case "flying":
-                    resultado = Color.FromRgb(137, 179, 200);
-                    break;
-                case "ghost":
-                    resultado = Color.FromRgb(157, 104, 146);
-                    break;
-                case "grass":
-                    resultado = Color.FromRgb(38, 202, 81);
-                    break;
-                case "ground":
-                    resultado = Color.FromRgb(120, 71, 27);
-                    break;
-                case "ice":
-                    resultado = Color.FromRgb(210, 241, 250);
-                    break;
-                case "normal":
-                    resultado = Color.FromRgb(217, 154, 168);
-                    break;
-                case "poison":
-                    resultado = Color.FromRgb(171, 108, 218);
-                    break;
-                case "psychic":
-                    resultado = Color.FromRgb(251, 36, 147);
-                    break;
-                case "rock":
-                    resultado = Color.FromRgb(158, 61, 30);
-                    break;
-                case "steel":
-                    resultado = Color.FromRgb(36, 189, 149);
-                    break;
-                case "water":
-                    resultado = Color.FromRgb(20, 171, 251);
-                    break;
-
+                if (txtPE.Text == "eevee")
+                {
+                    await Navigation.PushAsync(new VistaEevee(txtPE.Text));
+                }
+                else
+                {
+                    await Navigation.PushAsync(new VistaPokemon(txtPE.Text, ImgPE.CommandParameter.ToString()));
+                }
             }
-            return resultado;
         }
 
-        public Color BGColor(string color)
+        private async void ImgSE_Clicked(object sender, EventArgs e)
         {
-            Color resultado = new Color();
-            switch (color)
+            if (frSE.BackgroundColor == Color.Gray)
             {
-                case "red":
-                    resultado = Color.Red;
-                    break;
-                case "blue":
-                    resultado = Color.Blue;
-                    break;
-                case "yellow":
-                    resultado = Color.Yellow;
-                    break;
-                case "green":
-                    resultado = Color.Green;
-                    break;
-                case "black":
-                    resultado = Color.Black;
-                    break;
-                case "brown":
-                    resultado = Color.Brown;
-                    break;
-                case "purple":
-                    resultado = Color.Purple;
-                    break;
-                case "gray":
-                    resultado = Color.Gray;
-                    break;
-                case "white":
-                    resultado = Color.White;
-                    break;
-                case "pink":
-                    resultado = Color.Pink;
-                    break;
-                
 
+                await Navigation.PushAsync(new VistaPokemon(txtSE.Text, ImgSE.CommandParameter.ToString()));
             }
-            return resultado;
+        }
+
+        private async void ImgTE_Clicked(object sender, EventArgs e)
+        {
+            if (frTE.BackgroundColor == Color.Gray)
+            {
+                await Navigation.PushAsync(new VistaPokemon(txtTE.Text, ImgTE.CommandParameter.ToString()));
+            }
+        }
+
+        private async void HandlerComun(object sender, EventArgs e)
+        {
+            var habilidad = ((Button)sender).Text.ToUpper();
+            string url = ((Button)sender).CommandParameter.ToString();
+            var texto = await InfoHability(url);
+
+            await DisplayAlert(habilidad, texto, "Cerrar");
+        }
+
+        private async void ImgTPE_Clicked(object sender, EventArgs e)
+        {
+            await Navigation.PushAsync(new VistaPokemon(txtTPE.Text, ImgTPE.CommandParameter.ToString()));
+
         }
 
     }

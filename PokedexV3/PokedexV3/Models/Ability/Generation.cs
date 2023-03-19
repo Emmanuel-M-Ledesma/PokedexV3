@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace PokedexV3.Models
+namespace PokedexV3.Models.Ability
 {
-    public class PokeListModel
+    public partial class Generation
     {
         [JsonProperty("name")]
         public string Name { get; set; }

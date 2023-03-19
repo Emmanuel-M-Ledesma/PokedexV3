@@ -1,11 +1,13 @@
 ﻿using Newtonsoft.Json;
 using PokedexV3.Models;
 using PokedexV3.Models.Info;
+using PokedexV3.Models.Lista;
 using PokedexV3.Vistas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,153 +26,189 @@ namespace PokedexV3
         public string Siguiente;
         public string Previo;
         public string UrlDesc;
+        public string Generacion;
+        List<PokeImgModel> listaPokemon = new List<PokeImgModel>();
         public ListaPokemon()
         {
             InitializeComponent();
-            URL = "https://pokeapi.co/api/v2/pokemon";
+            ToolbarItem item = new ToolbarItem
+            {
+                Text = "Buscar",
+                Priority = 5,
+                Order = ToolbarItemOrder.Secondary
+            };
+            URL = "https://pokeapi.co/api/v2/pokedex/1";
             UrlDesc = "https://pokeapi.co/api/v2/pokemon-species/";
-            _ = GetPokemon(URL);
-            BackgroundColor = Color.Black;
+            
 
+            this.IsVisible = false;
+
+            LoadComponents().ContinueWith(task =>
+            {
+                if (task.IsCompleted && !task.IsFaulted && !task.IsCanceled)
+                {
+                    Device.BeginInvokeOnMainThread(() => { this.IsVisible = true; });
+                }
+            });
         }
-        public async Task<bool> GetPokemon(string url)
-        {
 
+
+
+        private async Task LoadComponents()
+        {
+            await GetPokemon(URL);
+            BackgroundColor = Color.Black;
+        }
+
+        public async Task<List<PokeImgModel>> GetPokemon(string url)
+        {
+            listaPokemon.Clear();
             HttpClient http = new HttpClient();
-            List<PokeImgModel> pokelist = new List<PokeImgModel>();
             var respuesta = await http.GetAsync(url);
             if (respuesta.IsSuccessStatusCode)
             {
-
                 var respString = await respuesta.Content.ReadAsStringAsync();
-                var json = JsonConvert.DeserializeObject<PokeModel>(respString);
-                Siguiente = json.Next;
-                Previo = json.Previous;
-                if (string.IsNullOrEmpty(Previo))
-                {
-                    btPrev.IsVisible = false;
-                }
-                else
-                {
-                    btPrev.IsVisible = true;
-                }
-                if (string.IsNullOrEmpty(Siguiente))
-                {
-                    btNext.IsVisible = false;
-                }
-                else
-                {
-                    btNext.IsVisible = true;
-                }
-                foreach (var poke in json.Results)
-                {
+                var json = JsonConvert.DeserializeObject<PokedexModel>(respString);
 
-                    PokeImgModel listModel = new PokeImgModel();
-                    listModel.Name = poke.Name.ToUpper();
-                    listModel.Url = poke.Url;
-                    listModel.UrlImg = "https://img.pokemondb.net/sprites/home/normal/" + poke.Name + ".png";
-                    var  order = await getOrder("https://pokeapi.co/api/v2/pokemon/" + poke.Name, 0);
-                    listModel.frColor = await getColor(order);
-                    pokelist.Add(listModel);
-                }   
+                foreach (var poke in json.PokemonEntries)
+                {
+                    PokeImgModel listModel = new PokeImgModel
+                    {
+                        Name = poke.PokemonSpecies.Name.ToUpper(),
+                        Url = poke.PokemonSpecies.Url,
+                        UrlImg = "https://img.pokemondb.net/sprites/home/normal/" + poke.PokemonSpecies.Name + ".png"
+                    };
+                    listaPokemon.Add(listModel);
 
-                ListPoke.ItemsSource = pokelist;
+                }
+                ListPoke.ItemsSource = null;
+                ListPoke.ItemsSource = listaPokemon;
                 ListPoke.BackgroundColor = Color.Black;
                 ListPoke.SeparatorColor = Color.Wheat;
             }
-            return true;
+            return listaPokemon;
         }
-        public async Task<long> getOrder(string Url, long orden)
+        public async Task<List<PokeImgModel>> GetGenPokemon(string Url)
         {
+            listaPokemon.Clear();
             HttpClient http = new HttpClient();
-            InfoImgModel Pokemon = new InfoImgModel();
-            var resp = await http.GetAsync(Url);
-            if (resp.IsSuccessStatusCode)
+            var respuesta = await http.GetAsync(Url);
+            if (respuesta.IsSuccessStatusCode)
             {
-                var respString = await resp.Content.ReadAsStringAsync();
-                var json = JsonConvert.DeserializeObject<InfoPoke>(respString);
-                Pokemon.Id = json.Id;
-                orden = Pokemon.Id;
-                return orden;   
+                var respString = await respuesta.Content.ReadAsStringAsync();
+                var json = JsonConvert.DeserializeObject<GenerationModel>(respString);
+                foreach (var genPoke in json.PokemonSpecies)
+                {
+                    PokeImgModel generationModel = new PokeImgModel()
+                    {
+                        Name = genPoke.Name,
+                        Url = genPoke.Url,
+                        UrlImg = "https://img.pokemondb.net/sprites/home/normal/" + genPoke.Name + ".png"
+                    };
+
+                    listaPokemon.Add(generationModel);
+                }
+                ListPoke.ItemsSource = null;
+                ListPoke.ItemsSource = listaPokemon;
+                ListPoke.BackgroundColor = Color.Black;
+                ListPoke.SeparatorColor = Color.Wheat;
             }
-            return orden;
+
+            return listaPokemon;
         }
-        public async Task<string> getColor(long orden)
+
+        private void Buscar_TextChanged(object sender, TextChangedEventArgs e)
         {
-            string color = "";
-            var Detalle = UrlDesc + orden;
-            HttpClient http = new HttpClient();
-            DetalleModel PokeDetail = new DetalleModel();
-            var resp = await http.GetAsync(Detalle);
-            if (resp.IsSuccessStatusCode)
+
+            var palabra = Buscar.Text;
+            var item = listaPokemon;
+            if (!string.IsNullOrEmpty(palabra))
             {
-                var respString = await resp.Content.ReadAsStringAsync();
-                var json = JsonConvert.DeserializeObject<DetalleModel>(respString);
-
-                PokeDetail.Color = json.Color;
-                color = PokeDetail.Color.Name;
+                ListPoke.ItemsSource = item.Where(x => x.Name.ToLower().Contains(palabra.ToLower()));
             }
-            return color;
-        }
-        private async void btPrev_Clicked(object sender, EventArgs e)
-        {
-            await GetPokemon(Previo);
-            ListPoke.ScrollTo(1, ScrollToPosition.Start, false);
-        }
+            else
+            {
+                ListPoke.ItemsSource = listaPokemon;
+            }
 
-        private async void btNext_Clicked(object sender, EventArgs e)
-        {
-            await GetPokemon(Siguiente);
-            ListPoke.ScrollTo(1, ScrollToPosition.Start, false);
-        }
 
+        }
         private async void ListPoke_ItemTapped(object sender, ItemTappedEventArgs e)
         {
+            
             var tappedItem = e.Item as PokeImgModel;
-            string x = tappedItem.Name;
-            await Navigation.PushAsync(new VistaPokemon(x));
+            var x = tappedItem.Url.ToString();
+            var y = tappedItem.Name.ToString();
+            if (x == "https://pokeapi.co/api/v2/pokemon-species/133/")
+            {
+                await Navigation.PushAsync(new VistaEevee(y));
+            }
+            else
+            {
+                await Navigation.PushAsync(new VistaPokemon(y,x));
+            }
+        }
+        private async void ToolbarItem_Clicked(object sender, EventArgs e)
+        {
+            string res = await DisplayActionSheet("Filtrar por Generacion", "Cerrar", null,
+                "Todos - Nacional",
+                "Generacion 1 - Región Kanto",
+                "Generacion 2 - Región Jhoto",
+                "Generacion 3 - Región Hoenn",
+                "Generacion 4 - Región Sinnoh",
+                "Generacion 5 - Región Unova",
+                "Generacion 6 - Región Kalos",
+                "Generacion 7 - Región Alola",
+                "Generacion 8 - Región Galar");
+            TraerGeneracion(res);
+        }
+        private void Mostrarbarra()
+        {
+            if (Buscar.IsVisible)
+            {
+                Buscar.IsVisible = false;
+                ToolbarItems[0].IconImageSource = "SearchIcon.png";
+            }
+            else
+            {
+                Buscar.IsVisible = true;
+                ToolbarItems[0].IconImageSource = "CloseIcon.png";
+            }
+
+        }
+        private void BuscarClicked(object sender, EventArgs e)
+        {
+            Mostrarbarra();
         }
 
-        //public Color BGColor(string color)
-        //{
-        //    Color resultado = new Color();
-        //    switch (color)
-        //    {
-        //        case "red":
-        //            resultado = Color.Red;
-        //            break;
-        //        case "blue":
-        //            resultado = Color.Blue;
-        //            break;
-        //        case "yellow":
-        //            resultado = Color.Yellow;
-        //            break;
-        //        case "green":
-        //            resultado = Color.Green;
-        //            break;
-        //        case "black":
-        //            resultado = Color.Black;
-        //            break;
-        //        case "brown":
-        //            resultado = Color.Brown;
-        //            break;
-        //        case "purple":
-        //            resultado = Color.Purple;
-        //            break;
-        //        case "gray":
-        //            resultado = Color.Gray;
-        //            break;
-        //        case "white":
-        //            resultado = Color.White;
-        //            break;
-        //        case "pink":
-        //            resultado = Color.Pink;
-        //            break;
+        private async void TraerGeneracion(string res)
+        {
+            Dictionary<string, string> generaciones = new Dictionary<string, string>()
+            {
+                { "Todos - Nacional", URL },
+                { "Generacion 1 - Región Kanto", "https://pokeapi.co/api/v2/generation/1" },
+                { "Generacion 2 - Región Jhoto", "https://pokeapi.co/api/v2/generation/2" },
+                { "Generacion 3 - Región Hoenn", "https://pokeapi.co/api/v2/generation/3" },
+                { "Generacion 4 - Región Sinnoh", "https://pokeapi.co/api/v2/generation/4" },
+                { "Generacion 5 - Región Unova", "https://pokeapi.co/api/v2/generation/5" },
+                { "Generacion 6 - Región Kalos", "https://pokeapi.co/api/v2/generation/6" },
+                { "Generacion 7 - Región Alola", "https://pokeapi.co/api/v2/generation/7" },
+                { "Generacion 8 - Región Galar", "https://pokeapi.co/api/v2/generation/8" }
+            };
 
+            if (generaciones.TryGetValue(res, out string url))
+            {
+                if (res == "Todos - Nacional")
+                {
+                    await GetPokemon(url);
+                }
+                else
+                {
+                    await GetGenPokemon(url);
+                }
 
-        //    }
-        //    return resultado;
-        //}
-
+                this.Title = res;
+            }
+        }
     }
 }
