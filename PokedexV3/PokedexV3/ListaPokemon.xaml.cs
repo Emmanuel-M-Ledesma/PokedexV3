@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
-
+using Xamarin.Essentials;
 using Xamarin.Forms;
 using Xamarin.Forms.Internals;
 using Xamarin.Forms.Xaml;
@@ -39,7 +39,7 @@ namespace PokedexV3
             };
             URL = "https://pokeapi.co/api/v2/pokedex/1";
             UrlDesc = "https://pokeapi.co/api/v2/pokemon-species/";
-            
+
 
             this.IsVisible = false;
 
@@ -135,17 +135,17 @@ namespace PokedexV3
         }
         private async void ListPoke_ItemTapped(object sender, ItemTappedEventArgs e)
         {
-            
+
             var tappedItem = e.Item as PokeImgModel;
             var x = tappedItem.Url.ToString();
             var y = tappedItem.Name.ToString();
             if (x == "https://pokeapi.co/api/v2/pokemon-species/133/")
             {
-                await Navigation.PushAsync(new VistaEevee(y));
+                await CheckConnAsync(null, new VistaEevee(y), false);
             }
             else
             {
-                await Navigation.PushAsync(new VistaPokemon(y,x));
+                await CheckConnAsync(new VistaPokemon(y, x), null, true);
             }
         }
         private async void ToolbarItem_Clicked(object sender, EventArgs e)
@@ -208,6 +208,24 @@ namespace PokedexV3
                 }
 
                 this.Title = res;
+            }
+        }
+
+
+        private async Task CheckConnAsync(VistaPokemon vista, VistaEevee vistaEevee, bool vistaNormal)
+        {
+            // Intenta establecer la conexión de nuevo aquí
+            if (Connectivity.NetworkAccess == NetworkAccess.Internet)
+            {
+                // Hay conexión a Internet, cambia a la vista normal
+
+                if (vistaNormal) await Navigation.PushAsync(vista);
+                else await Navigation.PushAsync(vistaEevee);
+
+            }
+            else
+            {
+                await Navigation.PushAsync(new NoConexion());
             }
         }
     }

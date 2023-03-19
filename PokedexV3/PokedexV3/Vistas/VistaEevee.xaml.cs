@@ -12,6 +12,7 @@ using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using System.IO;
 using PokedexV3.Resources;
+using Xamarin.Essentials;
 
 namespace PokedexV3.Vistas
 {
@@ -47,6 +48,23 @@ namespace PokedexV3.Vistas
             GridContenido.IsVisible = false;
             GridContenido.IsVisible = true;
         }
+
+        private async Task CheckConnAsync(VistaPokemon vista)
+        {
+            // Intenta establecer la conexión de nuevo aquí
+            if (Connectivity.NetworkAccess == NetworkAccess.Internet)
+            {
+                // Hay conexión a Internet, cambia a la vista normal
+                await Navigation.PushAsync(vista);
+
+            }
+            else
+            {
+                await Navigation.PushAsync(new NoConexion());
+            }
+        }
+
+        
 
         public async Task<bool> GetInfo(string Url)
         {
@@ -209,42 +227,42 @@ namespace PokedexV3.Vistas
 
         private async void ImgPPE_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new VistaPokemon(txtPPE.Text, ImgPPE.CommandParameter.ToString()));
+            await CheckConnAsync(new VistaPokemon(txtPPE.Text, ImgPPE.CommandParameter.ToString()));            
         }
 
         private async void ImgSPE_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new VistaPokemon(txtSPE.Text,ImgSPE.CommandParameter.ToString()));
+            await CheckConnAsync(new VistaPokemon(txtSPE.Text,ImgSPE.CommandParameter.ToString()));
         }
 
         private async void ImgTPE_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new VistaPokemon(txtTPE.Text, ImgTPE.CommandParameter.ToString()));
+            await CheckConnAsync(new VistaPokemon(txtTPE.Text, ImgTPE.CommandParameter.ToString()));
         }
 
         private async void ImgCPE_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new VistaPokemon(txtCPE.Text, ImgCPE.CommandParameter.ToString()));
+            await CheckConnAsync(new VistaPokemon(txtCPE.Text, ImgCPE.CommandParameter.ToString()));
         }
 
         private async void ImgQPE_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new VistaPokemon(txtQPE.Text, ImgQPE.CommandParameter.ToString()));
+            await CheckConnAsync(new VistaPokemon(txtQPE.Text, ImgQPE.CommandParameter.ToString()));
         }
 
         private async void ImgSePE_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new VistaPokemon(txtSePE.Text, ImgSePE.CommandParameter.ToString()));
+            await CheckConnAsync(new VistaPokemon(txtSePE.Text, ImgSePE.CommandParameter.ToString()));
         }
 
         private async void ImgSepPE_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new VistaPokemon(txtSepPE.Text, ImgSepPE.CommandParameter.ToString()));
+            await CheckConnAsync(new VistaPokemon(txtSepPE.Text, ImgSepPE.CommandParameter.ToString()));
         }
 
         private async void ImgOPE_Clicked(object sender, EventArgs e)
         {
-            await Navigation.PushAsync(new VistaPokemon(txtOPE.Text, ImgOPE.CommandParameter.ToString()));
+            await CheckConnAsync(new VistaPokemon(txtOPE.Text, ImgOPE.CommandParameter.ToString()));
         }
         private async void HandlerComun(object sender, EventArgs e)
         {
